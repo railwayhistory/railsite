@@ -1,0 +1,12 @@
+[package]
+name = "railsite"
+version = "0.1.0"
+authors = ["Martin Hoffmann <hn@nvnc.de>"]
+
+[dependencies]
+hyper = "0.10"
+raildata = { git = "https://github.com/railwayhistory/raildata.git" }
+
+[[bin]]
+name = "railsite"
+doc = false
