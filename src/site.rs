@@ -1,20 +1,26 @@
-use std::net::ToSocketAddrs;
-use hyper::error::Result;
-use hyper::server::{Listening, Request, Response, Server};
+use futures::{Finished, finished};
+use hyper::Error;
+use hyper::header::{ContentLength, ContentType};
+use hyper::server::{Service, Request, Response};
 
+static PHRASE: &'static [u8] = b"Hello World!";
 
-fn handle(_req: Request, res: Response) {
-    let _ = res.send(b"Hello world!");
+#[derive(Clone, Copy)]
+pub struct Site;
+
+impl Service for Site {
+    type Request = Request;
+    type Response = Response;
+    type Error = Error;
+    type Future = Finished<Response, Error>;
+
+    fn call(&self, _req: Request) -> Self::Future {
+        finished(
+            Response::new()
+                .with_header(ContentLength(PHRASE.len() as u64))
+                .with_header(ContentType::plaintext())
+                .with_body(PHRASE)
+        )
+    }
 }
 
-pub struct Site(Server);
-
-impl Site {
-    pub fn new<A: ToSocketAddrs>(addr: A) -> Result<Self> {
-        Ok(Site(Server::http(addr)?))
-    }
-
-    pub fn serve(self) -> Result<Listening> {
-        self.0.handle(handle)
-    }
-}

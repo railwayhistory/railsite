@@ -4,7 +4,8 @@ version = "0.1.0"
 authors = ["Martin Hoffmann <hn@nvnc.de>"]
 
 [dependencies]
-hyper = "0.10"
+futures = "0.1.7"
+hyper = { git = "https://github.com/hyperium/hyper.git" }
 raildata = { git = "https://github.com/railwayhistory/raildata.git" }
 
 [[bin]]
