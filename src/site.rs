@@ -1,26 +1,23 @@
-use futures::{Finished, finished};
-use hyper::Error;
-use hyper::header::{ContentLength, ContentType};
-use hyper::server::{Service, Request, Response};
+use std::net::SocketAddr;
+use hyper::Result;
+use hyper::server::Http;
+use ::http;
+use ::views::index;
 
-static PHRASE: &'static [u8] = b"Hello World!";
-
-#[derive(Clone, Copy)]
-pub struct Site;
-
-impl Service for Site {
-    type Request = Request;
-    type Response = Response;
-    type Error = Error;
-    type Future = Finished<Response, Error>;
-
-    fn call(&self, _req: Request) -> Self::Future {
-        finished(
-            Response::new()
-                .with_header(ContentLength(PHRASE.len() as u64))
-                .with_header(ContentType::plaintext())
-                .with_body(PHRASE)
-        )
-    }
+pub struct Site {
+    addr: SocketAddr,
 }
 
+impl Site {
+    pub fn new(addr: SocketAddr) -> Self {
+        Site {
+            addr: addr
+        }
+    }
+
+    pub fn run(&self) -> Result<()> {
+        let server = Http::new().bind(&self.addr,
+                                      || Ok(http::Site::new((), index)))?;
+        server.run()
+    }
+}
