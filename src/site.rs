@@ -1,23 +1,22 @@
-use std::net::SocketAddr;
-use hyper::Result;
-use hyper::server::Http;
-use ::http;
-use ::views::index;
+use futures::future::Future;
+use hyper;
+use hyper::server::{Request, Response, Service};
+use super::errors::serve_404;
+use super::statics::serve_statics;
 
-pub struct Site {
-    addr: SocketAddr,
-}
+pub struct Railsite;
 
-impl Site {
-    pub fn new(addr: SocketAddr) -> Self {
-        Site {
-            addr: addr
+impl Service for Railsite {
+    type Request = Request;
+    type Response = Response;
+    type Error = hyper::Error;
+    type Future = Box<Future<Item=Self::Response, Error=Self::Error>>;
+
+    fn call(&self, request: Request) -> Self::Future {
+        if let Some(response) = serve_statics(&request) {
+            return response
         }
-    }
-
-    pub fn run(&self) -> Result<()> {
-        let server = Http::new().bind(&self.addr,
-                                      || Ok(http::Site::new((), index)))?;
-        server.run()
+        serve_404(request)
     }
 }
+

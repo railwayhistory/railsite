@@ -4,10 +4,12 @@ version = "0.1.0"
 authors = ["Martin Hoffmann <hn@nvnc.de>"]
 
 [dependencies]
-futures = "0.1.7"
-hyper = { git = "https://github.com/hyperium/hyper.git" }
+futures = "0.1.14"
+hyper = "0.11.7"
+mime = "0.2"
 raildata = { git = "https://github.com/railwayhistory/raildata.git" }
 url = "1.0"
+xml-rs = "0.3.5"
 
 [[bin]]
 name = "railsite"
