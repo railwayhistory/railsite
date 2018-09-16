@@ -1,15 +1,13 @@
 //! Delivery of static content.
 
-use futures::future;
-use futures::future::Future;
-use hyper::mime;
-use hyper::{Error, Method, StatusCode};
-use hyper::header::{Allow, ContentLength, ContentType};
-use hyper::server::{Request, Response};
+use hyper::{Body, Method, Request, Response, StatusCode};
+
+const TEXT_CSS: &str = "text/css";
+const TEXT_JAVASCRIPT: &str = "text/javascript";
 
 macro_rules! statics {
     ( $request:expr, $( ($path:expr, $mime:expr), )* ) => {{
-        match $request.path() {
+        match $request.uri().path() {
             $(
                 concat!("/static/", $path) => {
                     Some(serve_str($request,
@@ -23,34 +21,33 @@ macro_rules! statics {
 }
 
 
-pub fn serve_statics(request: &Request)
-                     -> Option<Box<Future<Item=Response, Error=Error>>> {
+pub fn serve_statics(request: &Request<Body>) -> Option<Response<Body>> {
     statics!(request,
-        ("style.css", mime::TEXT_CSS),
-        ("js/bootstrap.min.js", mime::TEXT_JAVASCRIPT),
-        ("js/jquery.min.js", mime::TEXT_JAVASCRIPT),
-        ("js/popper.min.js", mime::TEXT_JAVASCRIPT),
+        ("style.css", TEXT_CSS),
+        ("js/bootstrap.min.js", TEXT_JAVASCRIPT),
+        ("js/jquery.min.js", TEXT_JAVASCRIPT),
+        ("js/popper.min.js", TEXT_JAVASCRIPT),
     )
 }
 
 
-pub fn serve_str(request: &Request, content: &'static str, ctype: mime::Mime)
-                 -> Box<Future<Item=Response, Error=Error>> {
-    if let &Method::Get = request.method() {
-        Box::new(future::ok(
-            Response::new()
-                .with_header(ContentLength(content.len() as u64))
-                .with_header(ContentType(ctype))
-                .with_body(content)
-        ))
+pub fn serve_str(
+    request: &Request<Body>,
+    content: &'static str,
+    ctype: &'static str,
+) -> Response<Body> {
+    if let &Method::GET = request.method() {
+        Response::builder()
+            .header("Content-Type", ctype)
+            .body(content.into())
+            .unwrap()
     }
     else {
-        Box::new(future::ok(
-            Response::new()
-                .with_status(StatusCode::MethodNotAllowed)
-                .with_header(Allow(vec![Method::Get]))
-                .with_header(ContentLength("Method Not Allowed".len() as u64))
-                .with_body("Method Not Allowed")
-        ))
+        Response::builder()
+            .status(StatusCode::METHOD_NOT_ALLOWED)
+            .header("Allow", "GET")
+            .body("Method Not Allowed".into())
+            .unwrap()
     }
 }
+

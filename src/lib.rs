@@ -1,15 +1,14 @@
 extern crate futures;
+#[macro_use] extern crate htmlfn;
 extern crate hyper;
 extern crate raildata;
 /*
 extern crate url;
 */
-extern crate xml;
 
 pub use self::site::Railsite;
 
 mod errors;
-pub mod htmlfn;
 mod site;
 mod statics;
 mod views;

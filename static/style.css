@@ -6353,4 +6353,7 @@ a.text-dark:focus, a.text-dark:hover {
 .invisible {
   visibility: hidden !important; }
 
+main {
+  padding-top: 40px; }
+
 /*# sourceMappingURL=style.css.map */

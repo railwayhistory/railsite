@@ -4,12 +4,13 @@ version = "0.1.0"
 authors = ["Martin Hoffmann <hn@nvnc.de>"]
 
 [dependencies]
-futures = "0.1.14"
-hyper = "0.11.7"
+futures = "^0.1"
+htmlfn = { git = "https://github.com/partim/htmlfn.git" }
+hyper = "^0.12"
 mime = "0.2"
 raildata = { git = "https://github.com/railwayhistory/raildata.git" }
 url = "1.0"
-xml-rs = "0.3.5"
+tokio = "^0.1"
 
 [[bin]]
 name = "railsite"
