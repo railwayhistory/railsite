@@ -1,0 +1,217 @@
+---
+key: src.de.l.pre
+type: source
+subtype: journal
+designation: Preußische Gesetzsammlung
+digital:
+    -   https://opacplus.bsb-muenchen.de/title/BV002568851 # bis 1876
+regards:
+    -   org.de.l.pre
+
+
+---
+key: src.de.l.pre.1867
+type: source
+subtype: volume
+collection: src.de.l.pre
+title: Gesetz-Sammlung für die Königlichen Preußischen Staaten.
+volume: !!str 1867.
+digital:
+    -   http://digital.staatsbibliothek-berlin.de/werkansicht/?PPN=PPN781617189
+    -   http://digital.staatsbibliothek-berlin.de/werkansicht/?PPN=PPN781617553
+    -   http://digital.staatsbibliothek-berlin.de/werkansicht/?PPN=PPN821591290
+    -   http://digital.staatsbibliothek-berlin.de/werkansicht/?PPN=PPN821591894
+
+
+---
+key: src.de.l.pre.1867.8
+type: source
+subtype: issue
+collection: src.de.l.pre.1867
+number: Nr. 8.
+date: 1867-01-28
+pages: 129-136
+digital: http://digital.staatsbibliothek-berlin.de/werkansicht?PPN=PPN781617189&PHYSID=PHYS_0185
+
+---
+key: src.de.l.pre.1867.8.129
+type: source
+subtype: article
+title: >
+    (Nr. 6525.) Patent wegen Besitznahme der Herzogthümer Holstein und
+    Schleswig. Vom 12. Januar 1867.
+collection: src.de.l.pre.1867.8
+pages: 129-130
+digital: http://digital.staatsbibliothek-berlin.de/werkansicht?PPN=PPN781617189&PHYSID=PHYS_0185
+regards:
+    -   org.de.l.pre
+    -   org.de.l.sh
+
+
+---
+key: src.de.ablmb.1946.13.305
+type: source
+designation: >
+    Amtsblatt der Militärregierung Britisches Kontrollgebiet Jahrg 1946 Nr 13
+    Seite 305.
+digital: http://deposit.d-nb.de/cgi-bin/recht.pl?bild=0&navigation=1&wahl=0&zeitung=miligovb&jahrgang=1946&ausgabe=13&seite=03990305&filename=.gif
+
+
+---
+key: src.de.Bfv.1928
+type: source
+subtype: book
+organization: org.de.DR
+#editor: Reichsbahn-Zentralamt
+title: |
+    Amtliches Bahnhofverzeichnis 1928 der Deutschen Reichsbahn, der
+    Saarbahn, der deutschen Privatbahnen und der Kleinbahnen mit
+    Güterverkehr
+date: 1927-12-09
+
+
+---
+key: src.de.Bfv.1933
+type: source
+subtype: book
+organization: org.de.DR
+#editor: Reichsbahn-Zentralamt für Rechungswesen
+title:
+    Amtliches Bahnhofverzeichnis 1933 der Deutschen Reichsbahn, der
+    Saarbahn, der deutschen Privatbahnen und der Kleinbahnen mit
+    Güterverkehr
+date: 1933-03-01
+
+
+---
+key: src.de.DB.Hmb.Karte.1984
+type: source
+subtype: misc
+title: Übersichtskarte der Bundesbahndirektion Hamburg
+edition: November 1984
+url: http://blocksignal.de/krt/f.php?k=al84
+
+
+---
+key: src.de.DBAG.BSV.2017
+type: source
+subtype: online
+organization: org.de.DB-Netz
+title: >
+    Betriebsstellenverzeichnis
+edition: Stand 01/2017
+date: 2017-02-09
+url: http://data.deutschebahn.com/dataset/data-betriebsstellen/resource/0d0acc75-38cc-4632-bf4f-5cdbe6ad2d73
+
+
+---
+key: src.de.DBAG.Geo-Betriebsstelle.2017
+type: source
+subtype: online
+organization: org.de.DB-Netz
+title: >
+    Geo-Betriebsstelle
+edition: 11. Mai 2017
+url: http://data.deutschebahn.com/dataset/geo-betriebsstelle/resource/f1c98315-78cf-4b5e-b2e3-d1c8da31edc3
+
+
+---
+key: src.de.DBAG.Geo-Strecke.2017
+type: source
+subtype: online
+organization: org.de.DB-Netz
+title: >
+    Geo-Strecke
+edition: Januar 2017
+url: http://data.deutschebahn.com/dataset/geo-strecke/resource/9c0e50bf-6f00-4491-9dd0-9adc2cecbc89
+
+
+---
+key: src.de.DRG.1927
+type: source
+subtype: book
+title: Reichsbahn-Handbuch 1927
+
+
+---
+key: src.de.DRG.1935
+type: source
+subtype: book
+organization: org.de.DR
+title: Die Deutschen Eisenbahnen in ihrer Entwicklung 1835-1935 
+#publisher: Reichsdruckerei
+date: 1935
+note:
+    deu: > 
+        vollständiger, unveränderter Nachdruck "als:" Handbuch der Deutschen
+        Eisenbahnstrecken, Verlag Horst-Werner Dumjahn 1984.
+
+
+---
+key: src.de.DRG.Alt.Karte.1931
+type: source
+subtype: misc
+title: Übersichtskarte des Reichsbahndirektions-Bezirks Altona
+edition: Zustand 1. April 1931
+date: 1931-04-01
+#note: restaurierter Nachdruck 2014, GVE-Verlag Berlin.
+
+
+---
+key: src.de.DRG.Alt.Karte.1949
+type: source
+subtype: misc
+title: Karte der Reichsbahndirektion Hamburg 1949
+
+
+---
+key: src.de.DS100.1984
+type: source
+subtype: book
+#editor: Deutsche Bundesbahn
+title: >
+    DS 100/2. Verzeichnis der Abkürzungen.
+    Bahnhöfe und Betriebsstellen (VdAbk 2)
+edition: Berichtigungsblatt 2
+date: 1984-06-03
+
+
+---
+key: src.de.Kb.1905
+type: source
+subtype: book
+#editor: Kursbureau des Reichs-Postamts
+title: Reichs-Kursbuch
+edition: !!str 1905
+#publisher: Verlag von Julius Springer
+date: 1914
+
+
+---
+key: src.de.Kb.1914
+type: source
+subtype: book
+#editor: Kursbureau des Reichs-Postamts
+title: Reichs-Kursbuch
+edition: !!str 1914
+#publisher: Verlag von Julius Springer
+date: 1914
+
+
+---
+key: src.de.WP.Chronik-Streckenelektrifizierung-DBAG
+type: source
+subtype: article
+collection: src.de.WP
+title: Chronik der Streckenelektrifizierung der Deutschen Bahn AG
+revision: 9. Juli 2011, 15:14 UTC
+url: http://de.wikipedia.org/w/index.php?title=Chronik_der_Streckenelektrifizierung_der_Deutschen_Bahn_AG&oldid=91037305
+
+
+---
+key: src.de.WP
+type: source
+subtype: online
+title: Wikipedia, Die freie Enzyklopädie
+url: http://de.wikipedia.org/
+

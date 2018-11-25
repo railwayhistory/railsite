@@ -1,53 +1,46 @@
 //! Delivery of static content.
 
-use hyper::{Body, Method, Request, Response, StatusCode};
+use actix_web::{Error, HttpRequest, HttpResponse, Responder};
+use actix_web::http::StatusCode;
 
-const TEXT_CSS: &str = "text/css";
-const TEXT_JAVASCRIPT: &str = "text/javascript";
 
 macro_rules! statics {
-    ( $request:expr, $( ($path:expr, $mime:expr), )* ) => {{
-        match $request.uri().path() {
-            $(
-                concat!("/static/", $path) => {
-                    Some(serve_str($request,
-                                   include_str!(concat!("../static/", $path)),
-                                   $mime))
-                }
-            )*
-            _ => None
-        }
+    ( $app:expr, $( $path:expr => $mime:expr, )* ) => {{
+        $app
+        $(
+            .resource(concat!("/static/", $path), |r| {
+                static CONTENT: ::statics::StaticContent
+                                    = ::statics::StaticContent {
+                    content: include_bytes!(concat!("../static/", $path)),
+                    ctype: $mime
+                };
+                r.get().f(|_| &CONTENT)
+            })
+        )*
     }}
 }
 
 
-pub fn serve_statics(request: &Request<Body>) -> Option<Response<Body>> {
-    statics!(request,
-        ("style.css", TEXT_CSS),
-        ("js/bootstrap.min.js", TEXT_JAVASCRIPT),
-        ("js/jquery.min.js", TEXT_JAVASCRIPT),
-        ("js/popper.min.js", TEXT_JAVASCRIPT),
-    )
+//------------ StaticContent -------------------------------------------------
+
+pub struct StaticContent {
+    pub content: &'static [u8],
+    pub ctype: &'static [u8],
 }
 
 
-pub fn serve_str(
-    request: &Request<Body>,
-    content: &'static str,
-    ctype: &'static str,
-) -> Response<Body> {
-    if let &Method::GET = request.method() {
-        Response::builder()
-            .header("Content-Type", ctype)
-            .body(content.into())
-            .unwrap()
-    }
-    else {
-        Response::builder()
-            .status(StatusCode::METHOD_NOT_ALLOWED)
-            .header("Allow", "GET")
-            .body("Method Not Allowed".into())
-            .unwrap()
+impl Responder for &'static StaticContent {
+    type Item = HttpResponse;
+    type Error = Error;
+
+    fn respond_to<S>(
+        self,
+        req: &HttpRequest<S>
+    ) -> Result<HttpResponse, Error> {
+        Ok(req
+            .build_response(StatusCode::OK)
+            .content_type(self.ctype)
+            .body(self.content)
+        )
     }
 }
-

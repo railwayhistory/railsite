@@ -1,0 +1,220 @@
+---
+key: line.de.1000
+type: line
+events:
+    -   date: !!null
+        region:
+            - org.de
+            - org.de.l.sh
+
+    -   date: !!null
+        de.VzG: !!str 1000
+        source: src.de.DBAG.Geo-Strecke.2017
+
+    #   Genehmigungen
+    #
+    -   date: 1862-05-01
+        concession:
+            by: org.dk
+            for: org.gb.Morton-Peto
+        note:
+            deu: >
+                Die Konzession wurde am 1863-04-26 auf die
+                [org.de.Nordschleswigsche-Eisenbahn] übertragen.
+        source: src.de.DRG.1935 # 1864/8
+
+    #   Eröffnung und Einstellung
+    #
+    -   date: 1864-04-15
+        status: open
+        source: src.de.DRG.1935 # 1864/8
+
+    #   Eigenschaften
+    #
+    -   date: !!null
+        category: de.Hauptbahn
+        tracks: 2
+        gauge: 1435mm
+        source: src.de.DRG.1927
+    -   date: 1996-03-03
+        electrified: de
+        source: src.de.WP.Chronik-Streckenelektrifizierung-DBAG
+
+    #   Eigentümer etc.
+    #
+
+    #   Verlauf
+    #
+    -   date: !!null
+        course: path.de.1000 flw ghar
+
+points:
+    -   point.de.Flensburg-Weiche                   # de.1040
+    -   point.de.Flensburg-Friedensweg
+    -   point.de.Harrislee
+    -   point.int.Harrislee-Padborg
+
+    
+---
+key: point.de.Flensburg-Weiche
+type: point
+junction: True
+events:
+    -   date: !!null
+        name: Nordschleswigsche Weiche
+        source: src.de.Kb.1905
+    -   date: 1914
+        name: Flensburg Weiche
+    -   date: !!null
+        de.lknr: 01 077
+        source: src.de.Bfv.1928
+    -   date: !!null
+        category: de.Bf
+        de.rang: I
+        source: src.de.Bfv.1933
+    -   date: de.lknr.30
+        de.lknr: 01 424
+        source: src.de.Bfv.1933
+    -   date: !!null
+        de.DS100: AFW
+        de.dstnr: !!str 014241
+        source: src.de.DS100.1984
+    -   date: !!null
+        de.name16: Flensburg Weiche
+        PLC: DE13219
+        source: src.de.DBAG.BSV.2017
+
+    -   date: !!null
+        location:
+            line.de.1000: 167,34
+        source: src.de.DRG.Alt.Karte.1931
+    -   date: 1981
+        location:
+            line.de.1000: 172,916
+        source: src.de.DBAG.Geo-Betriebsstelle.2017
+
+    -   date: !!null
+        site:
+            path.de.1000: flw
+
+
+---
+key: point.de.Flensburg-Friedensweg
+type: point
+junction: True
+events:
+    -   date: !!null
+        location:
+            line.de.1000: 168,75
+        category: de.Bk
+        name: Np
+        source: src.de.DRG.Alt.Karte.1931
+    -   date: c1940
+        category: de.Abzw
+        name: Friedensweg
+        source: src.de.DRG.Alt.Karte.1949
+    -   date: 1981
+        location:
+            line.de.1000: 174,57
+        source: src.de.DB.Hmb.Karte.1984
+    -   date: !!null
+        de.DS100: AFR
+        de.dstnr: !!str 017046
+        source: src.de.DS100.1984
+    -   date: !!null
+        PLC: DE13216
+        source: src.de.DBAG.BSV.2017
+    -   date: c2000
+        name: Flensburg Friedensweg
+        de.name16: Friedensweg
+        source: src.de.DBAG.BSV.2017
+    -   date: c2000
+        location:
+            line.de.1000: 174,400
+        source: src.de.DBAG.Geo-Betriebsstelle.2017
+
+    -   date: !!null
+        site:
+            path.de.1000: fri
+
+
+---
+key: point.de.Harrislee
+type: point
+events:
+    -   date: c1910
+        status: open
+        source:
+            - src.de.Kb.1905
+            - src.de.Kb.1914
+    -   date: !!null
+        name: Harrislee
+        source: src.de.Kb.1914
+    -   date: !!null
+        de.lknr: 01 079
+        source: src.de.Bfv.1928
+    -   date: !!null
+        location:
+            line.de.1000: 171,87
+        category: de.Bf
+        de.rang: IV
+        source: src.de.DRG.Alt.Karte.1931
+    -   date: de.lknr.30
+        de.lknr: 01 434
+        source: src.de.Bfv.1933
+    -   date: 1981
+        location:
+            line.de.1000: 177,44
+        source: src.de.DB.Hmb.Karte.1984
+    -   date: !!null
+        de.DS100: AHAL
+        de.dstnr: !!str 014340
+        source: src.de.DS100.1984
+    -   date: c1995
+        status: closed
+
+    -   date: !!null
+        site:
+            path.de.1000: har
+
+
+---
+key: point.int.Harrislee-Padborg
+type: point
+subtype: border
+events:
+    -   date: !!null
+        name:
+            de: Flensburg Grenze
+        de.lknr: 01 326
+        source: src.de.Bfv.1928
+    -   date: !!null
+        category: de.Gp
+        source: src.de.Bfv.1933
+    -   date: de.lknr.30
+        de.lknr: 01 430
+        source: src.de.Bfv.1933
+    -   date: !!null
+        location:
+            line.de.1000: 174,21
+        source: src.de.DRG.Alt.Karte.1931
+    -   date: 1981
+        location:
+            line.de.1000: 179,784
+        source: src.de.DB.Hmb.Karte.1984
+    -   date: !!null
+        de.DS100: AGRP
+        de.dstnr: !!str 014308
+        source: src.de.DS100.1984
+    -   date: !!null
+        de.name16: Flensburg Grenze
+        PLC: DE13217
+        source: src.de.DBAG.BSV.2017
+    -   date: c1995
+        de.DS100: AXFW
+        source: src.de.DBAG.BSV.2017
+
+    -   date: !!null
+        site:
+            path.de.1000: ghar
+

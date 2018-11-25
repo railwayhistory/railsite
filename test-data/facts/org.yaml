@@ -1,0 +1,138 @@
+---
+key: org.de
+type: organization
+subtype: country
+progress: stub
+events:
+    -   date: !!null
+        
+        short_name:
+            eng: Germany
+            deu: Deutschland
+        name:
+            eng: Federal Republic of Germany
+            deu: Bundesrepublik Deutschland
+
+
+---
+key: org.de.l.pre
+type: organization
+subtype: region
+progress: stub
+events:
+    -   date: !!null
+        name: Preußischer Staat
+    -   date: 1920-11-30
+        name: Freistaat Preußen
+    -   date: 1947-02-25
+        status: closed
+
+
+---
+key: org.de.l.sh
+type: organization
+subtype: region
+events:
+    -   date: 1867-01-12
+        status: open
+        document: src.de.l.pre.1867.8.129
+    -   date: !!null
+        name: Provinz Schleswig-Holstein
+        master: org.de.l.pre
+    -   date: 1846-08-23
+        name: Land Schleswig-Holstein
+        master: org.de
+        document: src.de.ablmb.1946.13.305
+
+
+---
+key: org.de.Altona-Kieler-Eisenbahn
+type: organization
+subtype: company
+events:
+    -   date: !!null
+        name: Altona-Kieler Eisenbahngesellschaft
+
+
+---
+key: org.de.DB-Netz
+type: organization
+subtype: company
+progress: stub
+events:
+    -   date: !!null
+        name: DB Netz AG
+
+
+---
+key: org.de.DR
+type: organization
+subtype: company
+progress: stub
+events:
+    -   date: 1924-08-31
+        status: open
+        name: Deutsche Reichsbahn-Gesellschaft
+    -   date: 1937-02-12
+        name: Deutsche Reichsbahn
+
+
+---
+key: org.de.Nordschleswigsche-Eisenbahn
+type: organization
+subtype: company
+progress: stub
+events:
+    -   date: !!null
+        status: open
+        name: Norschleswigsche Eisenbahn-Gesellschaft
+        source: src.de.DRG.1935 # 1864/8
+    -   date: 1865-03-20?
+        status: closed
+        successor: org.de.Schleswigsche-Eisenbahn
+        source: src.de.DRG.1935 # 1854/12
+
+
+---
+key: org.de.Schleswigsche-Eisenbahn
+type: organization
+subtype: company
+progress: stub
+events:
+    -   date: !!null
+        status: open
+        name: Schleswigsche Eisenbahn-Gesellschaft
+        source: src.de.DRG.1935 # 1854/12
+    -   date: 1870-01-01
+        status: closed
+        successor: org.de.Altona-Kieler-Eisenbahn
+        source: src.de.DRG.1935 # 1854/12
+
+    #   Betrieb der Strecken bereits 1865-08-04 durch die Altona-Kieler
+    #   Eisenbahn übernommen. - src.de.DRG.1935 # 1864/8
+
+---
+key: org.dk
+type: organization
+subtype: country
+events:
+    -   date: !!null
+        name:
+            eng: Kingdom of Denmark
+            dan: Kongeriget Danmark
+            deu: Königreich Dänemark
+        short_name:
+            eng: Denmark
+            dan: Danmark
+            deu: Dänemark
+
+
+---
+key: org.gb.Morton-Peto
+type: organization
+subtype: person
+progress: stub
+events:
+    -   date: !!null
+        name: Sir Samuel Morton Peto
+

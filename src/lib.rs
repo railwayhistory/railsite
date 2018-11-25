@@ -1,15 +1,18 @@
-extern crate futures;
+extern crate actix_web;
 #[macro_use] extern crate htmlfn;
-extern crate hyper;
 extern crate raildata;
-/*
-extern crate url;
-*/
 
-pub use self::site::Railsite;
+pub use self::app::Railsite;
 
-mod errors;
-mod site;
-mod statics;
+#[macro_use] mod statics;
+
+mod app;
+mod html;
 mod views;
 
+/*
+mod core;
+mod errors;
+mod index;
+mod site;
+*/

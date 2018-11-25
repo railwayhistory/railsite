@@ -1,12 +1,17 @@
 //! The core of our HTML output.
 //!
+use actix_web::{Error, HttpRequest, HttpResponse, Responder};
+use actix_web::http::StatusCode;
 use htmlfn::core::Content;
+
+
+//------------ Functions -----------------------------------------------------
 
 pub fn other<T: Content, B: Content>(
     lang: &'static str,
     title: T,
     body: B
-) -> impl Content {
+) -> HtmlContent {
     core(lang, title, Nav::Other, body)
 }
 
@@ -16,8 +21,8 @@ pub fn core<T: Content, B: Content>(
     title: T,
     nav: Nav,
     body: B
-) -> impl Content {
-    html!(
+) -> HtmlContent {
+    HtmlContent::ok(html!(
         html(lang=lang) {
             head {
                 title { title }
@@ -41,7 +46,7 @@ pub fn core<T: Content, B: Content>(
                 script(src="/static/js/bootstrap.min.js") { }
             }
         }
-    )
+    ))
 }
 
 pub enum Nav {
@@ -81,6 +86,44 @@ impl Nav {
                     }
                 }
             }
+        )
+    }
+}
+
+
+//------------ HtmlContent ---------------------------------------------------
+
+pub struct HtmlContent {
+    status: StatusCode,
+    content: String,
+}
+
+impl HtmlContent {
+    pub fn ok<C: Content>(content: C) -> Self {
+        HtmlContent {
+            status: StatusCode::OK,
+            content: content.into_string(),
+        }
+    }
+
+    pub fn status(mut self, status: StatusCode) -> Self {
+        self.status = status;
+        self
+    }
+}
+
+impl Responder for HtmlContent {
+    type Item = HttpResponse;
+    type Error = Error;
+
+    fn respond_to<S>(
+        self,
+        req: &HttpRequest<S>
+    ) -> Result<HttpResponse, Error> {
+        Ok(req
+            .build_response(self.status)
+            .content_type("text/html; charset=utf-8")
+            .body(self.content)
         )
     }
 }
