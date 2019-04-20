@@ -23,15 +23,7 @@ pub fn lines(req: &HttpRequest) -> HttpResponse {
         _ => None
     }).take_while(move |line| {
         match line {
-            Some(line) => {
-                if !line.key().starts_with(start.as_str()) {
-                    println!("{} {}", start.as_str(), line.key());
-                    false
-                }
-                else {
-                    true
-                }
-            }
+            Some(line) => line.key().starts_with(start.as_str()),
             None => false
         }
     }).map(Option::unwrap);

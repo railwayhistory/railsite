@@ -11,11 +11,11 @@ pub fn index<'a>(line: &'a Line, _library: &'a Library) -> impl Content + 'a {
     other("en",
         ("Line ", code),
         elements!(
-            h1() {
+            @h1 {
                 "Line ";
                 code;
             }
-            p() {
+            @p {
                 { format!("{:?}", line) }
             }
         )
