@@ -1,0 +1,7 @@
+@mixin make-icon($content) {
+    @extend %fa-icon;
+    @extend .fa;
+    &:before {
+        content: fa-content($content);
+    }
+}

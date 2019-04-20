@@ -1,0 +1,20 @@
+//
+// Frame Footer
+//
+
+
+// #frame-footer -- the footer part of the frame
+//
+#frame-footer {
+    border-top: 1px solid $beige;
+    padding-top: 10px;
+    margin-top: 0;
+}
+
+
+.footer-content {
+    @extend .container;
+    @extend .small;
+
+    color: $gray;
+}

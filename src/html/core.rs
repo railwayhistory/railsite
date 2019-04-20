@@ -1,7 +1,5 @@
 //! The core of our HTML output.
 //!
-use actix_web::{Error, HttpRequest, HttpResponse, Responder};
-use actix_web::http::StatusCode;
 use htmlfn::core::Content;
 
 
@@ -11,42 +9,84 @@ pub fn other<T: Content, B: Content>(
     lang: &'static str,
     title: T,
     body: B
-) -> HtmlContent {
-    core(lang, title, Nav::Other, body)
+) -> impl Content {
+    core(lang, title, (), Nav::Other, (), body, ())
 }
 
 
-pub fn core<T: Content, B: Content>(
+pub fn core<T: Content, H: Content, CH: Content, C: Content, S: Content>(
     lang: &'static str,
     title: T,
+    head: H,
     nav: Nav,
-    body: B
-) -> HtmlContent {
-    HtmlContent::ok(html!(
+    core_header: CH,
+    content: C,
+    scripts: S,
+) -> impl Content {
+    html!(
         html(lang=lang) {
-            head {
-                title { title }
-                meta(charset="utf-8") { }
+            head() {
+                title() { title }
+                meta(charset="utf-8");
                 meta(
                     name="viewport",
                     value="width=device-width, initial-scale=1, \
                            shrink-to-fit=no",
-                ) { }
-                link(rel="stylesheet", href="/static/style.css") { }
+                );
+                link(rel="stylesheet", href="/static/style.css");
+                head
             }
-            body {
-                nav(class="navbar navbar-expand-md navbar-light bg-light") {
-                    nav.content()
-                }
-                main(role="main", class="container") {
-                    body
+            body() {
+                div(id="frame") {
+                    header(id="frame-header") {
+                        div(class="brand-bar") {
+                            div(class="brand") {
+                                a(href="/") {
+                                    "The Railway History Database"
+                                }
+                            }
+                        }
+                        nav(class="frame-nav-bar") {
+                            div(class="frame-nav") {
+                                nav.content()
+                            }
+                        }
+                    }
+                    div(id="frame-core") {
+                        div(class="core-header-bar") {
+                            header(class="core-header") {
+                                core_header
+                            }
+                        }
+                        div(class="core-content") {
+                            content
+                        }
+                    }
+                    footer(id="frame-footer") {
+                        div(class="footer-content") {
+                            p() {
+                                "The Railway History Database is made \
+                                available under the Open Database License. \
+                                Any rights in individual contents of the \
+                                database are licensed under the Database \
+                                Content License. Documentation and other \
+                                text content is made available under a \
+                                Creative Commons Attribute-Share Alike 3.0 \
+                                Unported license. Images and other art work \
+                                may be licensed differently."
+                            }
+                            p() {
+                            }
+                        }
+                    }
                 }
                 script(src="/static/js/jquery.min.js") { }
                 script(src="/static/js/popper.min.js") { }
                 script(src="/static/js/bootstrap.min.js") { }
+                scripts
             }
         }
-    ))
+    )
 }
 
 pub enum Nav {
@@ -56,74 +96,16 @@ pub enum Nav {
 impl Nav {
     fn content(&self) -> impl Content {
         elements!(
-            a(class="navbar-brand", href="/") {
-                "RWH"
-            }
-            button(
-                class="navbar-toggler",
-                "type" => "button",
-                "data-toggle" => "collaps",
-                "data-target" => "#navbarDefault"
-            ) {
-                span(class="navbar-toggler-icon") { }
-            }
-            div(class="collapse navbar-collapse", id="navbarDefault") {
-                ul(class="navbar-nav mr-auto") {
-                    li(class="nav-item") {
-                        a(class="nav-link", href="#") {
-                            "First"
+            ul(class="frame-nav-parts") {
+                li() {
+                    a(href="/") {
+                        span(class="icon", title="Home") {
+                            i(class="frame-icon-home") { }
                         }
-                    }
-                    li(class="nav-item") {
-                        a(class="nav-link", href="#") {
-                            "Second"
-                        }
-                    }
-                    li(class="nav-item") {
-                        a(class="nav-link", href="#") {
-                            "Third"
-                        }
+                        span(class="text") { "Home" }
                     }
                 }
             }
-        )
-    }
-}
-
-
-//------------ HtmlContent ---------------------------------------------------
-
-pub struct HtmlContent {
-    status: StatusCode,
-    content: String,
-}
-
-impl HtmlContent {
-    pub fn ok<C: Content>(content: C) -> Self {
-        HtmlContent {
-            status: StatusCode::OK,
-            content: content.into_string(),
-        }
-    }
-
-    pub fn status(mut self, status: StatusCode) -> Self {
-        self.status = status;
-        self
-    }
-}
-
-impl Responder for HtmlContent {
-    type Item = HttpResponse;
-    type Error = Error;
-
-    fn respond_to<S>(
-        self,
-        req: &HttpRequest<S>
-    ) -> Result<HttpResponse, Error> {
-        Ok(req
-            .build_response(self.status)
-            .content_type("text/html; charset=utf-8")
-            .body(self.content)
         )
     }
 }

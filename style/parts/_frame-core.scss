@@ -1,0 +1,229 @@
+//
+// Frame Core
+//
+// The #frame-core consists of several parts starting with .core-.
+//
+// The design requires all vertical parts to have an outer block (which
+// sets the colour and possibly borders) and an inner block that limits
+// the width. For all these, the outer element will have the class suffixed
+// with -bar and the inner one will have the un-suffixed class.
+// 
+// When using the grid mechanism, there needs to be an extra element for
+// the row. This will receive the suffix -row.
+//
+
+
+// .core-header -- The core header.
+//
+.core-header-bar {
+    background-color: $boxbeige;
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid $beige;
+}    
+.core-header {
+    @extend .container;
+}
+.core-header-lead {
+    font-size: $font-size-lg;
+    font-weight: $headings-font-weight;
+    line-height: $line-height-base;
+}
+.core-header-sugar { // only show if there is space
+    // .hidden-xs;
+}
+
+
+// .core-action-header -- The core header with a button or two.
+//
+.core-action-header-bar {
+    @extend .core-header-bar;
+}
+.core-action-header {
+    @extend .container;
+    @include clearfix();
+}
+.core-action-header-header {
+    @include float-left();
+}
+.core-action-header-actions {
+    @include float-right();
+    margin: 20px 0;
+}
+
+// .core-nav -- A navigation bar for right under a .core-header  
+//
+.core-nav-bar {
+    background-color: $boxbeige-light;
+    border-bottom: 1px solid $beige-light;
+} 
+.core-nav {
+    @extend .container;
+}
+.core-nav > ul {
+    @extend .nav;
+    @extend .nav-pills;
+
+    color: $gray;
+
+    > li > a {
+        padding: .5ex .5em;
+        border-radius: 0;
+        color: inherit;
+    }
+    > li > a:hover,
+    > li > a:focus {
+        background-color: #e5d3af;
+        color: $ocean-light;
+    }    
+    > li.active > a {
+        background-color: $beige-light;
+        color: $gray-dark;
+    }
+    > li.active > a:hover,
+    > li.active > a:focus {
+        background-color: $beige-light;
+        color: $ocean-light;
+    }
+
+    .icon {
+        //.visible-xs;
+    }
+    .text {
+        //.hidden-xs;
+    }
+}
+.core-nav-parts {
+    @extend .float-left;
+}
+.core-nav-factory {
+    @extend .float-right;
+}
+
+
+// .core-content -- The regular content
+//
+.core-content-bar {
+    background-color: #fff;
+    padding: 1px 0; // force vertical margins to be white
+    margin: 0;
+}
+.core-content {
+    @extend .container;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+
+// .core-aside -- Core content with an aside to the right
+//
+.core-aside-bar {
+    background-color: #fff;
+    padding: 1px 0; // force vertical margins to be white
+    margin: 0;
+}
+.core-aside {
+    @extend .container;
+}
+.core-aside-row {
+    @include make-row();
+}
+.core-aside-main {
+    @include make-col(8);
+    margin: 20px 0;
+}
+.core-aside-aside {
+    @include make-col(4);
+    margin: 20px 0;
+}
+.core-aside-panel {
+    @extend .card;
+    //@extend .panel-default;
+}
+
+
+// .core-twin -- Two columns half and half.
+//
+// The two columns are .core-twin-left and .core-twin-right.
+//
+.core-twin-bar {
+    background-color: #fff;
+    padding: 1px 0; // force vertical margins to be white
+    margin: 0;
+}
+.core-twin {
+    @extend .container;
+}
+.core-twin-row {
+    @include make-row();
+}
+.core-twin-left,
+.core-twin-right {
+    @include make-col(6);
+    margin: 20px 0;
+}
+
+
+// .core-dialog -- A small dialog
+//
+.core-dialog-bar {
+    background-color: $gray-lighter;
+    padding: 1px 0; // force vertical margins to be white
+    margin: 0;
+}
+.core-dialog {
+    @extend .container;
+}
+.core-dialog-row {
+    @include make-row();
+}
+.core-dialog-dialog {
+    @include make-col(4);
+    //@include make-sm-column-offset(4);
+}
+.core-dialog-panel {
+    @extend .card;
+    //@extend .panel-default;
+    margin: 20px 0;
+}
+
+
+// .core-panel -- A collection of panels as core
+//
+// Add .core-panel-bar to whatever other core bar you are using. Then
+// do your thing and set each panel as core-panel with the normal Bootstrap
+// panel things inside.
+//
+.core-panel-bar {
+    background-color: $gray-lighter;
+}
+.core-panel {
+    @extend .card;
+    //@extend .panel-default;
+}
+.core-panel .panel-title {
+    @extend .h3;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+
+// .core-part -- A section that is listed in core-nav
+//
+.core-part > header {
+    //.visible-xs;
+
+    h1 {
+        @extend .h3;
+        margin-top: 0;
+    }
+}
+
+
+// .core-subpart -- A sub-section of a core-part
+//
+.core-subpart {
+    h2 {
+        @extend .h4;
+    }
+}
