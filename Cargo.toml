@@ -1,13 +1,18 @@
 [package]
 name = "railsite"
 version = "0.1.0"
+edition = "2018"
 authors = ["Martin Hoffmann <hn@nvnc.de>"]
 
 [dependencies]
-actix-web = "^0.7"
-htmlfn    = { git = "https://github.com/partim/htmlfn.git" }
+headers   = "0.3"
+#htmlfn    = { git = "https://github.com/partim/htmlfn.git" }
+horrorshow = "0.7"
+hyper =   "0.13"
 mime      = "^0.2"
 raildata  = { git = "https://github.com/railwayhistory/raildata.git" }
+tokio = { version = "0.2", features = ["full"] }
+url       = "1.2"
 
 [[bin]]
 name = "railsite"

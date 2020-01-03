@@ -1,43 +1,199 @@
 //! Tools for processing HTTP requests.
 
-use std::{fmt, io};
+use std::io;
 use std::borrow::Cow;
-use std::str::FromStr;
-use futures::future::{Future, FutureResult, IntoFuture};
-use hyper::Error;
-use hyper::server as hyper;
-use hyper::server::Service;
-use hyper::header::{ContentLength, ContentType};
-use hyper::status::StatusCode;
+use std::sync::Arc;
+use headers::{Cookie, HeaderMapExt};
+//use horrorshow::{Template, html};
+use hyper::{Body, Method, StatusCode};
+use hyper::http::uri::PathAndQuery;
+use hyper::http::response::Builder as ResponseBuilder;
+use raildata::library::Library;
+use url::form_urlencoded;
 use url::percent_encoding::percent_decode;
-
-pub use hyper::server::Response;
+use crate::i18n::Lang;
 
 
 //------------ Request -------------------------------------------------------
 
-pub struct Request<'a> {
-    request: &'a hyper::Request,
-    path_pos: Option<usize>,
+pub struct Request {
+    request: hyper::Request<Body>,
+    path: RequestPath,
+    lang: Lang,
+    library: Library,
+    //base: Arc<String>,
 }
 
-impl<'a> Request<'a> {
-    pub fn new(request: &'a hyper::Request) -> Self {
+impl Request {
+    pub fn new(
+        request: hyper::Request<Body>,
+        library: Library,
+        _base: Arc<String>,
+    ) -> Self {
         Request {
-            request: request,
-            path_pos: Some(0),
+            path: RequestPath::from_request(&request),
+            lang: Self::determine_lang(&request),
+            request,
+            library,
+            //base
         }
     }
 
-    pub fn next_segment(mut self) -> (Option<PathSegment<'a>>, Self) {
-        let mut start = match self.path_pos {
-            Some(start) => start,
-            None => return (None, self),
+    pub fn library(&self) -> &Library {
+        &self.library
+    }
+
+    /// Determine the language.
+    ///
+    /// Returns the language and prepares the builder.
+    fn determine_lang(
+        request: &hyper::Request<Body>
+    ) -> Lang {
+        // If we have a "lang" attribute in the query, we use that -- this is
+        // how we switch languages.
+        for (key, value) in form_urlencoded::parse(
+            request.uri().query().unwrap_or("").as_bytes()
+        ) {
+            if key == "lang" {
+                return Lang::from_code(value.as_ref())
+            }
+        }
+
+        // If we have a "lang" cookie, we use that.
+        if let Some(cookies) = request.headers().typed_get::<Cookie>() {
+            if let Some(lang) = cookies.get("lang") {
+                return Lang::from_code(lang)
+            }
+        }
+
+        // Otherwise we will do the default for now.
+        Lang::default()
+    }
+
+    /// Returns the requested language.
+    pub fn lang(&self) -> Lang {
+        self.lang
+    }
+
+    /// Returns the complete path.
+    pub fn path(&self) -> &RequestPath {
+        &self.path
+    }
+
+    pub fn path_mut(&mut self) -> &mut RequestPath {
+        &mut self.path
+    }
+
+    /// Returns the method of this request.
+    pub fn method(&self) -> &Method {
+        self.request.method()
+    }
+
+    /// Returns whether the request is a GET request.
+    pub fn is_get(&self) -> bool {
+        self.request.method() == Method::GET
+    }
+
+    /// Returns whether the request is a GET request.
+    pub fn is_post(&self) -> bool {
+        self.request.method() == Method::POST
+    }
+
+    pub fn get<F>(self, op: F) -> Result<Response, Self>
+    where F: FnOnce(Request) -> Result<Response, Self> {
+        if self.is_get() {
+            op(self)
+        }
+        else {
+            Err(self)
+        }
+    }
+
+    pub fn respond(
+        &self,
+        status: StatusCode,
+        body: Body,
+    ) -> Response {
+        ResponseBuilder::new()
+            .status(status)
+            .header("Content-Type", "text/html;charset=utf-8")
+            .header("Set-Cookie", self.lang.cookie())
+            .body(body)
+            .unwrap()
+    }
+
+    pub fn respond_raw(
+        &self,
+        status: StatusCode,
+        content_type: &str,
+        body: impl Into<Body>
+    ) -> Response {
+        ResponseBuilder::new()
+            .status(status)
+            .header("Content-Type", content_type)
+            .body(body.into())
+            .unwrap()
+    }
+
+    pub fn ok(&self, body: Body) -> Response {
+        self.respond(StatusCode::OK, body)
+    }
+
+    /*
+    pub fn link<'s>(&'s self, path: impl Template + 's) -> impl Template + 's {
+        html! {
+            : self.base.as_str();
+            : "/";
+            :path;
+        }
+    }
+    */
+}
+
+
+//------------ RequestPath ---------------------------------------------------
+
+pub struct RequestPath {
+    path: PathAndQuery,
+    segment: (usize, usize),
+}
+
+impl RequestPath {
+    fn from_request<B>(request: &hyper::Request<B>) -> Self {
+        let path = if let Cow::Owned(some) = percent_decode(
+            request.uri().path().as_bytes()
+        ).decode_utf8_lossy() {
+            PathAndQuery::from_maybe_shared(some).unwrap()
+        }
+        else {
+            request.uri().path_and_query().unwrap().clone()
         };
-        let path = self.request.path();
+        let mut res = RequestPath {
+            path,
+            segment: (0, 0),
+        };
+        res.next_segment();
+        res
+    }
+
+    pub fn full(&self) -> &str {
+        self.path.path()
+    }
+
+    pub fn remaining(&self) -> &str {
+        &self.full()[self.segment.1..]
+    }
+
+    pub fn segment(&self) -> &str {
+        &self.full()[self.segment.0..self.segment.1]
+    }
+
+    fn next_segment(&mut self) -> bool {
+        let mut start = self.segment.1;
+        let path = self.full();
         // Start beyond the length of the path signals the end.
         if start >= path.len() {
-            return (None, self)
+            return false;
         }
         // Skip any leading slashes. There may be multiple which should be
         // folded into one (or at least that’s what we do).
@@ -48,65 +204,64 @@ impl<'a> Request<'a> {
         // our segment, otherwise, we go all the way to the end of the path.
         let end = path[start..].find('/').map(|x| x + start)
                                          .unwrap_or(path.len());
-        let res = PathSegment::new(&path[start..end]);
-        self.path_pos = Some(end);
-        (Some(res), self)
-    }
-}
-
-impl<'a> Request<'a> {
-    /// Returns the complete path.
-    pub fn path(&self) -> &str {
-        self.request.path()
+        self.segment = (start, end);
+        true 
     }
 
-    /// Returns the remaining portion of the path.
-    pub fn remaining_path(&self) -> &str {
-        match self.path_pos {
-            Some(pos) => &self.request.path()[pos..],
-            None => &""
+    pub fn next(&mut self) -> Option<&str> {
+        if self.next_segment() {
+            Some(self.segment())
+        }
+        else {
+            None
         }
     }
 }
 
 
+//------------ Response ------------------------------------------------------
+
+pub type Response = hyper::Response<Body>;
+
+
 //----------- HtmlResponse ---------------------------------------------------
 
 pub struct HtmlResponse {
-    response: Response,
+    status: StatusCode,
     body: Vec<u8>,
 }
 
 impl HtmlResponse {
     pub fn new(status: StatusCode) -> Self {
         HtmlResponse {
-            response: Response::new().with_status(status)
-                                     .with_header(ContentType::html()),
-            body: Vec::new(),
+            status,
+            body: Vec::new()
         }
     }
 
     pub fn ok() -> Self {
-        HtmlResponse::new(StatusCode::Ok)
+        HtmlResponse::new(StatusCode::OK)
     }
 
     pub fn not_found() -> Self {
-        HtmlResponse::new(StatusCode::NotFound)
+        HtmlResponse::new(StatusCode::NOT_FOUND)
     }
 
     pub fn forbidden() -> Self {
-        HtmlResponse::new(StatusCode::Forbidden)
+        HtmlResponse::new(StatusCode::FORBIDDEN)
     }
 
     pub fn finalize(self) -> Response {
-        self.response.with_header(ContentLength(self.body.len() as u64))
-                     .with_body(self.body)
+        hyper::Response::builder()
+            .status(self.status)
+            .header("Content-Type", "text/html;charset=utf-8")
+            .body(self.body.into()).unwrap()
     }
 }
 
 impl From<HtmlResponse> for Response {
-    fn from(res: HtmlResponse) -> Self {
-        res.finalize()
+    fn from(html: HtmlResponse) -> Self {
+        html.finalize()
     }
 }
 
@@ -121,124 +276,34 @@ impl io::Write for HtmlResponse {
 }
 
 
-//------------ View ----------------------------------------------------------
-
-pub trait View<C> {
-    type Future: Future<Item=Response, Error=Error>;
-
-    fn call(&self, request: Request, context: &C) -> Self::Future;
-}
-
-impl<C, F, R, E>  View<C> for F 
-        where F: Fn(Request, &C) -> Result<R, E>,
-              R: Into<Response>, E: Into<Error> {
-    type Future = FutureResult<Response, Error>;
-
-    fn call(&self, request: Request, context: &C) -> Self::Future {
-        self(request, context).map(Into::into).map_err(Into::into)
-                              .into_future()
-    }
-}
-
-
-//------------ Site ----------------------------------------------------------
-
-pub struct Site<C, V> {
-    context: C,
-    root: V,
-}
-
-impl<C, V> Site<C, V> {
-    pub fn new(context: C, root: V) -> Self {
-        Site {
-            context: context,
-            root: root
-        }
-    }
-}
-
-impl<C, V: View<C>> Service for Site<C, V> {
-    type Request = hyper::Request;
-    type Response = hyper::Response;
-    type Error = Error;
-    type Future = V::Future;
-
-    fn call(&self, request: Self::Request) -> Self::Future {
-        self.root.call(Request::new(&request), &self.context)
-    }
-}
-
 /*
-impl<E: Clone, V: View<E>> NewService for Site<E, V> {
-    type Request = Request;
-    type Response = Response;
-    type Error = Error;
-    type Instance = Self;
+//------------ ContentExt ----------------------------------------------------
 
-    fn new_service(&self) -> Result<Self::Instance, io::Error> {
-        Ok(Self::new(self.env.clone(), self.root))
+pub trait ContentExt: Sized {
+    fn into_body(self) -> Body;
+
+    fn into_response(self, status: StatusCode, request: Request) -> Response {
+        request.respond(status, self.into_body())
+    }
+
+    fn ok(self, request: Request) -> Response {
+        self.into_response(StatusCode::OK, request)
+    }
+
+    fn method_not_allowed(self, request: Request) -> Response {
+        self.into_response(StatusCode::METHOD_NOT_ALLOWED, request)
+    }
+
+    fn not_found(self, request: Request) -> Response {
+        self.into_response(StatusCode::NOT_FOUND, request)
+    }
+}
+
+impl<C: Content + Sized> ContentExt for C {
+    fn into_body(self) -> Body {
+        let mut body = Vec::new();
+        self.write(&mut body).unwrap();
+        body.into()
     }
 }
 */
-
-
-//------------ PathSegment ---------------------------------------------------
-
-pub struct PathSegment<'a>(Result<Cow<'a, str>, Vec<u8>>);
-
-
-impl<'a> PathSegment<'a> {
-    pub fn new(s: &'a str) -> Self {
-        PathSegment(
-            match percent_decode(s.as_bytes()).if_any() {
-                Some(bytes) => {
-                    String::from_utf8(bytes)
-                           .map(Cow::Owned)
-                           .map_err(|err| err.into_bytes())
-                }
-                None => Ok(Cow::Borrowed(s))
-            }
-        )
-    }
-
-    pub fn as_bytes(&self) -> &[u8] {
-        match self.0 {
-            Ok(ref s) => s.as_bytes(),
-            Err(ref err) => err
-        }
-    }
-
-    pub fn as_str(&self) -> Option<&str> {
-        match self.0 {
-            Ok(ref s) => Some(s),
-            Err(_) => None
-        }
-    }
-
-    pub fn match_str(&self) -> &str {
-        match self.0 {
-            Ok(ref s) => s,
-            Err(_) => ""
-        }
-    }
-
-    pub fn try_as<T: FromStr>(&self) -> Option<T> {
-        let s = match self.0 {
-            Ok(ref s) => s,
-            Err(_) => return None
-        };
-        FromStr::from_str(s).ok()
-    }
-}
-
-impl<'a> fmt::Display for PathSegment<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self.0 {
-            Ok(ref s) => f.write_str(s),
-            Err(ref err) => {
-                f.write_str(&String::from_utf8_lossy(err))
-            }
-        }
-    }
-}
-

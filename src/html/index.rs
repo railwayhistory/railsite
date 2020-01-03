@@ -1,70 +1,85 @@
-use htmlfn::core::{Content, iter};
-use raildata::document::Line;
-use raildata::library::Library;
+use horrorshow::html;
 use super::core::other;
+use crate::http::Request;
+use crate::i18n::Lang;
+/*
+use raildata::document::Line;
+use crate::app::HttpRequest;
+use crate::document::{line, point};
+*/
 
-pub fn index(doc_num: usize) -> impl Content {
-    other("en",
+
+//------------ index ---------------------------------------------------------
+
+pub fn index(request: &Request, doc_num: usize) -> String {
+    other(request,
         "The Railway History Database",
-        elements!(
-            @h1 {
-                "The Railway History Database"
+        html! {
+            h1 {
+                : "The Railway History Database";
             }
-            @p {
-                "Currently containing ";
-                { htmlfn::core::display(doc_num) }
-                " documents";
+            p {
+                @ if request.lang() == Lang::De {
+                    : "Enthält zurzeit ";
+                    : doc_num;
+                    : " Dokumente";
+                } else {
+                    : "Currently containing ";
+                    : doc_num;
+                    : " documents";
+                }
             }
-        )
+        }
     )
 }
 
 
+/*
 //------------ lines ---------------------------------------------------------
 
 pub fn lines<'a>(
+    req: &'a HttpRequest,
     lines: impl Iterator<Item=&'a Line> + 'a,
-    library: &'a Library
 ) -> impl Content + 'a {
     other("en",
         "Line Index",
         elements!(
             @h1 { "Line Index" }
-            @table() {
+            @table(class="table") {
                 @tbody() { 
-                    {
-                        iter(lines.map(move |item| line(item, library)))
-                    }
+                    iter(lines.map(move |item| lines_row(req, item)))
                 }
             }
         )
     )
 }
 
-fn line<'a>(line: &'a Line, library: &'a Library) -> impl Content + 'a {
+fn lines_row<'a>(
+    req: &'a HttpRequest,
+    line: &'a Line,
+) -> impl Content + 'a {
     elements!(
         @tr {
             @td {
-                @a(href=("/", (line.key().as_str(), "/"))) {
-                    match line.code() {
-                        Ok((country, code)) => {
-                            (country.to_ascii_uppercase(), ("\u{a0}", code))
-                        }
-                        Err(code) => (String::new(), ("", code))
-                    }
+                @a(href=line::url(req, line)) {
+                    line::code(line)
                 }
             }
-            @td() {
+            @td {
                 iter({
                     let mut first = true;
-                    line.junctions(library).map(move |pt| {
-                        (
-                            if first {
-                                first = false;
-                                ""
+                    line.junctions(req.state()).map(move |pt| {
+                        elements!(
+                            {
+                                if first {
+                                    first = false;
+                                    ""
+                                }
+                                else { "\u{a0}– " }
                             }
-                            else { "\u{a0}– " },
-                            pt.name()
+                            @a(class="text-dark", href=point::url(req, pt)) {
+                                pt.name()
+                            }
                         )
                     })
                 })
@@ -72,3 +87,4 @@ fn line<'a>(line: &'a Line, library: &'a Library) -> impl Content + 'a {
         }   
     )
 }
+*/
