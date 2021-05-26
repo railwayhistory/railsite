@@ -1,58 +1,72 @@
-use std::io;
-use std::fs::File;
-use std::path::Path;
+use std::env;
+use std::env::current_dir;
 use std::convert::Infallible;
-use std::net::SocketAddr;
-use std::sync::Arc;
+use clap::{App, crate_authors, crate_version};
 use hyper::{Body, Response, Server};
 use hyper::service::{make_service_fn, service_fn};
-use raildata::library::Library;
+use raildata::load::report::Failed;
+use railsite::config::Config;
 use railsite::http::Request;
-use railsite::site;
+use railsite::site::SiteBase;
 
-fn load_library(path: impl AsRef<Path>) -> Result<Library, io::Error> {
-    let file = File::open(path)?;
-    Library::read(file).map_err(|err| {
-        io::Error::new(
-            io::ErrorKind::Other,
-            format!("{}", err)
-        )
-    })
-}
 
 async fn process(
     request: hyper::Request<Body>,
-    library: Library,
-    base: Arc<String>,
+    base: SiteBase,
 ) -> Result<Response<Body>, Infallible> {
-    Ok(site::process(Request::new(request, library, base)))
+    Ok(base.process(Request::new(request)))
 }
 
-#[tokio::main]
-async fn main() {
-    let library = load_library("test-data/output.bin").unwrap();
-    println!("Successfully loaded library.");
+async fn _main() -> Result<(), Failed> {
+    let cur_dir = match current_dir() {
+        Ok(dir) => dir,
+        Err(err) => {
+            eprintln!(
+                "Fatal: cannot get current directory ({}). Aborting.",
+                err
+            );
+            return Err(Failed)
+        }
+    };
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
-    let base = Arc::new(String::from("http://localhost:8080"));
+    let config = Config::from_arg_matches(
+        &Config::config_args(
+            App::new("railsite")
+                .version(crate_version!())
+                .author(crate_authors!())
+                .about("the railwayhistory.org server")
+        ).get_matches(),
+        &cur_dir
+    )?;
 
-    // A `Service` is needed for every connection, so this
-    // creates one from our `hello_world` function.
+    let base = SiteBase::load(&config)?;
+
+    eprintln!("Listening on {}", config.listen);
+
     let make_svc = make_service_fn(move |_conn| {
-        let library = library.clone();
         let base = base.clone();
         async move {
             Ok::<_, Infallible>(service_fn(move |r| {
-                process(r, library.clone(), base.clone())
+                process(r, base.clone())
             }))
         }
     });
 
-    let server = Server::bind(&addr).serve(make_svc);
+    let server = Server::bind(&config.listen).serve(make_svc);
 
-    // Run this server for... forever!
     if let Err(e) = server.await {
         eprintln!("server error: {}", e);
+        return Err(Failed)
+    }
+
+    Ok(())
+}
+
+
+#[tokio::main]
+async fn main() {
+    if let Err(_) = _main().await {
+        std::process::exit(1)
     }
 }
 

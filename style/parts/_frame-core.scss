@@ -7,15 +7,30 @@
 // sets the colour and possibly borders) and an inner block that limits
 // the width. For all these, the outer element will have the class suffixed
 // with -bar and the inner one will have the un-suffixed class.
-// 
-// When using the grid mechanism, there needs to be an extra element for
-// the row. This will receive the suffix -row.
-//
 
+body {
+    @extend .d-flex;
+    @extend .flex-column;
+    min-height: 100vh;
+}
+
+#frame-core {
+    border-top: 2px solid $ocean;
+    @extend .flex-grow-1;
+}
+
+.frame-core-map {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    padding: 0;
+}
 
 // .core-header -- The core header.
 //
 .core-header-bar {
+    @extend .shadow-sm;
+
     background-color: $boxbeige;
     padding: 0;
     margin: 0;
@@ -23,7 +38,24 @@
 }    
 .core-header {
     @extend .container;
+    @extend .py-2;
+
+    h1 {
+        @extend .my-0;
+    }
+
+    p {
+        @extend .my-0;
+	@extend .ml-1;
+    }
 }
+
+@include media-breakpoint-up(md) { 
+    .core-header {
+        padding-top: 2.5rem !important;
+    }
+}
+
 .core-header-lead {
     font-size: $font-size-lg;
     font-weight: $headings-font-weight;
@@ -44,46 +76,36 @@
     @include clearfix();
 }
 .core-action-header-header {
-    @include float-left();
+//   @include float-left();
 }
 .core-action-header-actions {
-    @include float-right();
+//    @include float-right();
     margin: 20px 0;
 }
 
 // .core-nav -- A navigation bar for right under a .core-header  
 //
 .core-nav-bar {
+    @extend .shadow-sm;
+
     background-color: $boxbeige-light;
-    border-bottom: 1px solid $beige-light;
+    --border-bottom: 1px solid $beige-light;
 } 
 .core-nav {
     @extend .container;
 }
 .core-nav > ul {
     @extend .nav;
-    @extend .nav-pills;
+    @extend .nav-tabs;
 
-    color: $gray;
+    color: $gray-700;
+
+    > li {
+        @extend .nav-item;
+    }
 
     > li > a {
-        padding: .5ex .5em;
-        border-radius: 0;
-        color: inherit;
-    }
-    > li > a:hover,
-    > li > a:focus {
-        background-color: #e5d3af;
-        color: $ocean-light;
-    }    
-    > li.active > a {
-        background-color: $beige-light;
-        color: $gray-dark;
-    }
-    > li.active > a:hover,
-    > li.active > a:focus {
-        background-color: $beige-light;
-        color: $ocean-light;
+        @extend .nav-link;
     }
 
     .icon {
@@ -104,14 +126,17 @@
 // .core-content -- The regular content
 //
 .core-content-bar {
-    background-color: #fff;
-    padding: 1px 0; // force vertical margins to be white
-    margin: 0;
 }
 .core-content {
     @extend .container;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    @extend .mt-3;
+    @extend .mb-2;
+
+    h2 {
+        @extend .mt-3;
+        @extend .mb-2;
+        font-size: 1.5rem;
+    }
 }
 
 
@@ -167,7 +192,7 @@
 // .core-dialog -- A small dialog
 //
 .core-dialog-bar {
-    background-color: $gray-lighter;
+    background-color: $gray-200;
     padding: 1px 0; // force vertical margins to be white
     margin: 0;
 }
@@ -195,7 +220,7 @@
 // panel things inside.
 //
 .core-panel-bar {
-    background-color: $gray-lighter;
+    background-color: $gray-200;
 }
 .core-panel {
     @extend .card;
@@ -210,12 +235,12 @@
 
 // .core-part -- A section that is listed in core-nav
 //
-.core-part > header {
+.core-part {
     //.visible-xs;
 
     h1 {
-        @extend .h3;
-        margin-top: 0;
+        margin: 2rem 0 1rem;
+        font-size: 1.75rem;
     }
 }
 
@@ -223,6 +248,8 @@
 // .core-subpart -- A sub-section of a core-part
 //
 .core-subpart {
+    @extend .mb-4;
+
     h2 {
         @extend .h4;
     }

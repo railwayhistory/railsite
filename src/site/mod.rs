@@ -1,15 +1,18 @@
 
-pub mod errors;
-pub mod home;
-//mod site;
-pub mod statics;
-//pub mod line;
+pub use self::site::{Site, SiteBase};
 
-use crate::http::{Request, Response};
-
-pub fn process(request: Request) -> Response {
-    statics::process(request)
-    .or_else(|request| home::process(request))
-    .unwrap_or_else(|request| errors::not_found(&request))
-}
+mod api;
+mod country;
+mod docs;
+mod document;
+mod errors;
+mod index;
+pub mod line;
+mod map;
+pub mod organization;
+pub mod point;
+pub mod source;
+mod site;
+mod statics;
+pub mod structure;
 

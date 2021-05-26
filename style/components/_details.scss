@@ -1,0 +1,69 @@
+// Components of details pages.
+
+.details-overview-timeline {
+    th {
+        @extend .text-muted;
+
+        font-weight: normal;
+        padding: 0 0.75rem 0 0;
+        empty-cells: hide;
+    }
+    td {
+        padding: 0;
+    }
+}
+
+.details-events-table {
+    @extend .table;
+    @extend .table-sm;
+
+    th {
+        font-weight: normal;
+        font-size: small;
+        text-transform: uppercase;
+    }
+
+    ul {
+        @extend .list-unstyled;
+        @extend .my-0;
+    }
+}
+.details-events-date {
+    text-align: center;
+
+    ul {
+        @extend .list-unstyled;
+        @extend .my-0;
+    }
+}
+
+.details-index-table {
+    @extend .table;
+    @extend .table-sm;
+
+    th {
+        font-weight: normal;
+    }
+
+    thead {
+        @extend .bg-light;
+
+        font-weight: normal;
+        font-size: small;
+        text-transform: uppercase;
+    }
+
+    .here-code {
+        text-align: center;
+    }
+
+    .here-not-ticked {
+        text-align: center;
+    }
+
+    .here-ticked {
+        @extend .bg-success;
+        @extend .text-light;
+        text-align: center;
+    }
+}

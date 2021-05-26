@@ -1,18 +1,23 @@
 use hyper::StatusCode;
 use crate::html;
 use crate::http::{Request, Response};
+use super::Site;
 
-pub fn method_not_allowed(request: &Request) -> Response {
-    request.respond(
-        StatusCode::METHOD_NOT_ALLOWED,
-        html::errors::method_not_allowed(request).into()
-    )
-}
 
-pub fn not_found(request: &Request) -> Response {
-    request.respond(
-        StatusCode::NOT_FOUND,
-        html::errors::not_found(request).into()
-    )
+//------------ Site ----------------------------------------------------------
+
+impl Site {
+    pub fn method_not_allowed(&self, request: Request) -> Response {
+        html::errors::method_not_allowed(
+            self, request.method(), request.path().full()
+        ).into_response(StatusCode::METHOD_NOT_ALLOWED)
+    }
+
+    pub fn not_found(&self, request: impl Into<Request>) -> Response {
+        let request = request.into();
+        html::errors::not_found(
+            self, request.path().full()
+        ).into_response(StatusCode::NOT_FOUND)
+    }
 }
 

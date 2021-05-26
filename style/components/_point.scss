@@ -1,0 +1,25 @@
+// Components for point views.
+
+.point-location-table {
+    @extend .table;
+    @extend .table-sm;
+    @extend .table-borderless;
+
+    width: auto !important;
+
+    th {
+        @extend .font-weight-normal;
+        padding-right: .5rem;
+    }
+    td {
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }
+
+    .point-location-date {
+        font-size: $font-size-sm;
+        padding-top: .425rem;
+        text-align: center;
+    }
+}
+

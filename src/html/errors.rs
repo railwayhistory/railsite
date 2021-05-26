@@ -1,69 +1,43 @@
-use horrorshow::html;
-use crate::http::Request;
-use crate::i18n::Lang;
-use super::core::other;
+//! Error pages.
 
-pub fn not_found(
-    request: &Request
-) -> String {
-    other(request,
-        "404 Not Found",
-        html! {
-            h1 {
-                @ if request.lang() == Lang::De {
-                    : "404 Nicht gefunden"
-                }
-                else {
-                    : "404 Not Found"
-                }
-            }
-            p {
-                @ if request.lang() == Lang::De {
-                    : "Der Pfad ";
-                    tt { : request.path().full() }
-                    : " konnte auf dem Server nicht gefunden werden."
-                }
-                else {
-                    : "Path ";
-                    tt { : request.path().full() }
-                    : " not found on this server."
-                }
-            }
-        }
+use hyper::Method;
+use crate::site::Site;
+use super::{i18n, skeleton};
+use super::target::{Content, Target, empty};
+
+
+pub fn not_found(site: &Site, path: &str) -> Target {
+    skeleton::headline(
+        site,
+        i18n::errors::term_404_not_found,
+        empty,
+        skeleton::Nav::Other,
+        |cont: &mut Content| {
+            cont.h1().text(i18n::errors::term_404_not_found)
+        },
+        |cont: &mut Content| {
+            i18n::errors::path_not_found(site.lang(), path, cont);
+        },
+        empty
     )
 }
 
-pub fn method_not_allowed(
-    request: &Request,
-) -> String {
-    other(request,
-        "405 Method Not Allowed",
-        html! {
-            h1 {
-                @ if request.lang() == Lang::De {
-                    : "405 Methode nicht zugelassen"
-                }
-                else {
-                    : "405 Method Not Allowed"
-                }
-            }
-            p {
-                @ if request.lang() == Lang::De {
-                    : "Die Methode ";
-                    tt { : request.method().as_str() }
-                    : " ist für den Pfad ";
-                    tt { : request.path().full() }
-                    : " nicht zugelassen."
-                }
-                else {
-                    : "The method ";
-                    tt { : request.method().as_str() }
-                    : " is not allowed at ";
-                    tt { : request.path().full() }
-                    : "."
-                }
-            }
-        }
+
+pub fn method_not_allowed(site: &Site, method: &Method, path: &str) -> Target {
+    skeleton::headline(
+        site,
+        i18n::errors::term_405_not_allowed,
+        empty,
+        skeleton::Nav::Other,
+        |cont: &mut Content| {
+            cont.h1().text(i18n::errors::term_405_not_allowed)
+        },
+        |cont: &mut Content| {
+            i18n::errors::method_not_allowed(
+                site.lang(), method.as_str(), path, cont
+            );
+        },
+        empty
     )
 }
 

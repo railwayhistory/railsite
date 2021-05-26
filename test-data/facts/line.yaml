@@ -3,6 +3,7 @@ key: line.de.1000
 type: line
 events:
     -   date: !!null
+        jurisdiction: de
         region:
             - org.de
             - org.de.l.sh

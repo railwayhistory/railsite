@@ -1,0 +1,57 @@
+// Generic compontents.
+
+.component-property-table {
+    @extend .table;
+    @extend .table-sm;
+    @extend .table-borderless;
+
+    width: auto !important;
+
+    th {
+        wrap: no-wrap;
+    }
+}
+
+.component-properties {
+    display: grid;
+    grid-template-columns: max-content auto;
+    column-gap: 1.5rem;
+    row-gap: 1rem;
+
+    h3 {
+        font-size: $font-size-base;
+        font-weight: $font-weight-bold;
+        line-height: $line-height-base;
+        margin: 0;
+        padding: 0;
+    }
+}
+.component-properties-values {
+    display: grid;
+    grid-template-columns: 5.5rem auto;
+    column-gap: 1rem;
+}
+.component-properties-date {
+    font-size: $font-size-sm;
+    padding-top: .125rem;
+    text-align: center;
+}
+
+
+.component-source-list {
+    display: grid;
+    grid-template-columns: max-content auto;
+
+    dt {
+        font-weight: normal;
+        padding-right: 1em;
+    }
+    dd {
+    }
+}
+
+.component-stub-badge {
+    @extend .alert;
+    @extend .alert-warning;
+}
+

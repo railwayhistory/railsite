@@ -1,14 +1,13 @@
 //! Tools for processing HTTP requests.
 
-use std::io;
+use std::ops;
 use std::borrow::Cow;
-use std::sync::Arc;
+use std::collections::HashMap;
 use headers::{Cookie, HeaderMapExt};
-//use horrorshow::{Template, html};
 use hyper::{Body, Method, StatusCode};
 use hyper::http::uri::PathAndQuery;
 use hyper::http::response::Builder as ResponseBuilder;
-use raildata::library::Library;
+use json::JsonValue;
 use url::form_urlencoded;
 use url::percent_encoding::percent_decode;
 use crate::i18n::Lang;
@@ -19,44 +18,36 @@ use crate::i18n::Lang;
 pub struct Request {
     request: hyper::Request<Body>,
     path: RequestPath,
+    query: HashMap<String, String>,
     lang: Lang,
-    library: Library,
-    //base: Arc<String>,
 }
 
 impl Request {
     pub fn new(
         request: hyper::Request<Body>,
-        library: Library,
-        _base: Arc<String>,
     ) -> Self {
+        let query = form_urlencoded::parse(
+            request.uri().query().unwrap_or("").as_bytes()
+        ).into_owned().collect();
+        let lang = Self::determine_lang(&request, &query);
         Request {
             path: RequestPath::from_request(&request),
-            lang: Self::determine_lang(&request),
-            request,
-            library,
-            //base
+            query, lang,
+            request
         }
-    }
-
-    pub fn library(&self) -> &Library {
-        &self.library
     }
 
     /// Determine the language.
     ///
     /// Returns the language and prepares the builder.
     fn determine_lang(
-        request: &hyper::Request<Body>
+        request: &hyper::Request<Body>,
+        query: &HashMap<String, String>,
     ) -> Lang {
         // If we have a "lang" attribute in the query, we use that -- this is
         // how we switch languages.
-        for (key, value) in form_urlencoded::parse(
-            request.uri().query().unwrap_or("").as_bytes()
-        ) {
-            if key == "lang" {
-                return Lang::from_code(value.as_ref())
-            }
+        if let Some(lang) = query.get("lang") {
+            return Lang::from_code(lang)
         }
 
         // If we have a "lang" cookie, we use that.
@@ -75,13 +66,20 @@ impl Request {
         self.lang
     }
 
-    /// Returns the complete path.
     pub fn path(&self) -> &RequestPath {
         &self.path
     }
 
     pub fn path_mut(&mut self) -> &mut RequestPath {
         &mut self.path
+    }
+
+    pub fn query(&self) -> &HashMap<String, String> {
+        &self.query
+    }
+
+    pub fn query_mut(&mut self) -> &mut HashMap<String, String> {
+        &mut self.query
     }
 
     /// Returns the method of this request.
@@ -99,10 +97,9 @@ impl Request {
         self.request.method() == Method::POST
     }
 
-    pub fn get<F>(self, op: F) -> Result<Response, Self>
-    where F: FnOnce(Request) -> Result<Response, Self> {
+    pub fn get(self) -> Result<GetRequest, Self> {
         if self.is_get() {
-            op(self)
+            Ok(GetRequest(self))
         }
         else {
             Err(self)
@@ -122,6 +119,16 @@ impl Request {
             .unwrap()
     }
 
+    pub fn respond_json(
+        &self,
+        status: StatusCode,
+        json: JsonValue
+    ) -> Response {
+        let mut body = Vec::new();
+        json.write(&mut body).unwrap();
+        self.respond_raw(status, "application/json", body)
+    }
+
     pub fn respond_raw(
         &self,
         status: StatusCode,
@@ -135,26 +142,53 @@ impl Request {
             .unwrap()
     }
 
+    pub fn redirect(&self, target: String) -> Response {
+        ResponseBuilder::new()
+            .status(StatusCode::MOVED_PERMANENTLY)
+            .header("Location", target)
+            .body("".into())
+            .unwrap()
+    }
+
     pub fn ok(&self, body: Body) -> Response {
         self.respond(StatusCode::OK, body)
     }
 
-    /*
-    pub fn link<'s>(&'s self, path: impl Template + 's) -> impl Template + 's {
-        html! {
-            : self.base.as_str();
-            : "/";
-            :path;
-        }
+    pub fn ok_json(&self, json: JsonValue) -> Response {
+        self.respond_json(StatusCode::OK, json)
     }
-    */
+}
+
+
+//------------ GetRequest ----------------------------------------------------
+
+pub struct GetRequest(Request);
+
+impl From<GetRequest> for Request {
+    fn from(src: GetRequest) -> Request {
+        src.0
+    }
+}
+
+impl ops::Deref for GetRequest {
+    type Target = Request;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl ops::DerefMut for GetRequest {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
 }
 
 
 //------------ RequestPath ---------------------------------------------------
 
 pub struct RequestPath {
-    path: PathAndQuery,
+    path: Result<PathAndQuery, String>,
     segment: (usize, usize),
 }
 
@@ -163,10 +197,10 @@ impl RequestPath {
         let path = if let Cow::Owned(some) = percent_decode(
             request.uri().path().as_bytes()
         ).decode_utf8_lossy() {
-            PathAndQuery::from_maybe_shared(some).unwrap()
+            Err(some)
         }
         else {
-            request.uri().path_and_query().unwrap().clone()
+            Ok(request.uri().path_and_query().unwrap().clone())
         };
         let mut res = RequestPath {
             path,
@@ -177,11 +211,14 @@ impl RequestPath {
     }
 
     pub fn full(&self) -> &str {
-        self.path.path()
+        match self.path.as_ref() {
+            Ok(path) => path.path(),
+            Err(path) => path.as_str()
+        }
     }
 
     pub fn remaining(&self) -> &str {
-        &self.full()[self.segment.1..]
+        &self.full()[self.segment.0..]
     }
 
     pub fn segment(&self) -> &str {
@@ -216,6 +253,27 @@ impl RequestPath {
             None
         }
     }
+
+    /// Returns the next segment if it is the final segment.
+    ///
+    /// If there are more segments after the next segment, returns the entire
+    /// remaining path as an error.
+    pub fn next_and_last(&mut self) -> Result<Option<&str>, &str> {
+        if !self.next_segment() {
+            return Ok(None)
+        }
+        let path = self.full();
+        if self.segment.1 == path.len()
+            || (self.segment.1 + 1 == path.len()
+                    && path.as_bytes()[self.segment.1] == b'/'
+                )
+        {
+            return Ok(Some(self.segment()))
+        }
+        else {
+            Err(self.remaining())
+        }
+    }
 }
 
 
@@ -223,87 +281,3 @@ impl RequestPath {
 
 pub type Response = hyper::Response<Body>;
 
-
-//----------- HtmlResponse ---------------------------------------------------
-
-pub struct HtmlResponse {
-    status: StatusCode,
-    body: Vec<u8>,
-}
-
-impl HtmlResponse {
-    pub fn new(status: StatusCode) -> Self {
-        HtmlResponse {
-            status,
-            body: Vec::new()
-        }
-    }
-
-    pub fn ok() -> Self {
-        HtmlResponse::new(StatusCode::OK)
-    }
-
-    pub fn not_found() -> Self {
-        HtmlResponse::new(StatusCode::NOT_FOUND)
-    }
-
-    pub fn forbidden() -> Self {
-        HtmlResponse::new(StatusCode::FORBIDDEN)
-    }
-
-    pub fn finalize(self) -> Response {
-        hyper::Response::builder()
-            .status(self.status)
-            .header("Content-Type", "text/html;charset=utf-8")
-            .body(self.body.into()).unwrap()
-    }
-}
-
-impl From<HtmlResponse> for Response {
-    fn from(html: HtmlResponse) -> Self {
-        html.finalize()
-    }
-}
-
-impl io::Write for HtmlResponse {
-    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        self.body.write(buf)
-    }
-
-    fn flush(&mut self) -> io::Result<()> {
-        self.body.flush()
-    }
-}
-
-
-/*
-//------------ ContentExt ----------------------------------------------------
-
-pub trait ContentExt: Sized {
-    fn into_body(self) -> Body;
-
-    fn into_response(self, status: StatusCode, request: Request) -> Response {
-        request.respond(status, self.into_body())
-    }
-
-    fn ok(self, request: Request) -> Response {
-        self.into_response(StatusCode::OK, request)
-    }
-
-    fn method_not_allowed(self, request: Request) -> Response {
-        self.into_response(StatusCode::METHOD_NOT_ALLOWED, request)
-    }
-
-    fn not_found(self, request: Request) -> Response {
-        self.into_response(StatusCode::NOT_FOUND, request)
-    }
-}
-
-impl<C: Content + Sized> ContentExt for C {
-    fn into_body(self) -> Body {
-        let mut body = Vec::new();
-        self.write(&mut body).unwrap();
-        body.into()
-    }
-}
-*/

@@ -3,6 +3,7 @@
 
 @import "../contrib/bootstrap-scss/functions";
 @import "variables";
+@import "../contrib/bootstrap-scss/variables";
 @import "../contrib/bootstrap-scss/mixins";
 @import "../contrib/bootstrap-scss/root";
 @import "../contrib/bootstrap-scss/print";
@@ -44,4 +45,9 @@
 @import "parts/frame-header";
 @import "parts/frame-core";
 @import "parts/frame-footer";
-
+@import "parts/home";
+@import "components/details";
+@import "components/generic";
+@import "components/inline";
+@import "components/line";
+@import "components/point";

@@ -1,0 +1,14 @@
+
+.document-key {
+    @extend .text-monospace;
+    @extend .text-muted;
+}
+.document-key::before {
+    @extend %fa-icon;
+    @extend .fas;
+    @extend .fa-xs;
+    content: fa-content($fa-var-key);
+    @extend .mr-1;
+    vertical-align: .1rem;
+}
+
