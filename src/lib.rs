@@ -1,10 +1,9 @@
-
-pub mod catalogue;
 pub mod config;
-pub mod documentation;
-pub mod html;
-pub mod http;
-pub mod map;
 pub mod i18n;
-pub mod site;
-pub mod tools;
+pub mod lang;
+pub mod page;
+pub mod panel;
+pub mod route;
+pub mod server;
+pub mod state;
+

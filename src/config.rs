@@ -51,7 +51,7 @@ impl Config {
             matches.value_of("config").unwrap_or("railsite.toml")
         );
 
-        let config = match fs::read(&config_path) {
+        let config = match fs::read_to_string(&config_path) {
             Ok(config) => config,
             Err(err) => {
                 eprintln!("Config file {}: {}", config_path.display(), err);
@@ -59,7 +59,7 @@ impl Config {
             }
         };
 
-        let mut config: Self = match toml::de::from_slice(&config) {
+        let mut config: Self = match toml::de::from_str(&config) {
             Ok(config) => config,
             Err(err) => {
                 eprintln!("Config file {}: {}", config_path.display(), err);

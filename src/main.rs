@@ -1,23 +1,11 @@
-use std::env;
 use std::env::current_dir;
-use std::convert::Infallible;
 use clap::{App, crate_authors, crate_version};
-use hyper::{Body, Response, Server};
-use hyper::service::{make_service_fn, service_fn};
-use raildata::load::report::Failed;
+use railsite::server;
 use railsite::config::Config;
-use railsite::http::Request;
-use railsite::site::SiteBase;
+use railsite::state::ServerState;
 
-
-async fn process(
-    request: hyper::Request<Body>,
-    base: SiteBase,
-) -> Result<Response<Body>, Infallible> {
-    Ok(base.process(Request::new(request)))
-}
-
-async fn _main() -> Result<(), Failed> {
+#[tokio::main]
+async fn main() {
     let cur_dir = match current_dir() {
         Ok(dir) => dir,
         Err(err) => {
@@ -25,7 +13,7 @@ async fn _main() -> Result<(), Failed> {
                 "Fatal: cannot get current directory ({}). Aborting.",
                 err
             );
-            return Err(Failed)
+            return
         }
     };
 
@@ -37,36 +25,19 @@ async fn _main() -> Result<(), Failed> {
                 .about("the railwayhistory.org server")
         ).get_matches(),
         &cur_dir
-    )?;
+    );
+    let config = match config {
+        Ok(config) => config,
+        Err(_) => return
+    };
 
-    let base = SiteBase::load(&config)?;
+    let state = match ServerState::load(&config) {
+        Ok(state) => state.into_arc(),
+        Err(_) => return
+    };
 
     eprintln!("Listening on {}", config.listen);
 
-    let make_svc = make_service_fn(move |_conn| {
-        let base = base.clone();
-        async move {
-            Ok::<_, Infallible>(service_fn(move |r| {
-                process(r, base.clone())
-            }))
-        }
-    });
-
-    let server = Server::bind(&config.listen).serve(make_svc);
-
-    if let Err(e) = server.await {
-        eprintln!("server error: {}", e);
-        return Err(Failed)
-    }
-
-    Ok(())
-}
-
-
-#[tokio::main]
-async fn main() {
-    if let Err(_) = _main().await {
-        std::process::exit(1)
-    }
+    server::serve(&config, state).await
 }
 

@@ -1,6 +1,0 @@
-database = "/home/m/rwh/data"
-documentation = "/home/m/rwh/doc"
-map = "/home/m/rwh/map"
-listen = "0.0.0.0:8080"
-url_base = "http://172.19.42.141:8080/"
-cache = "/tmp/tile-cache/"
