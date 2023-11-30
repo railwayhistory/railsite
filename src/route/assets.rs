@@ -4,6 +4,7 @@ use htmlfn::core::AttributeValue;
 use httools::request::PathIter;
 use httools::response::{ContentType, Response, ResponseBuilder};
 use crate::state::RequestState;
+use super::RouteError;
 
 pub(super) const SEGMENT: &'static str = "static";
 
@@ -16,11 +17,11 @@ macro_rules! assets {
             pub struct $type;
 
             impl $type {
-                pub fn link(
+                pub fn href(
                     state: &RequestState
                 ) -> impl AttributeValue + '_ {
                     (
-                        super::Root::link(state),
+                        super::Root::href(state),
                         SEGMENT,
                         concat!("/", $path)
                     )
@@ -28,23 +29,29 @@ macro_rules! assets {
             }
         )*
 
-        pub(super) fn process(path: PathIter) -> Response {
+        pub(super) fn process(
+            path: PathIter
+        ) -> Result<Response, RouteError> {
             match path.remaining() {
                 $(
                     $path => {
-                        ResponseBuilder::new().content_type($mime).body(
+                        Ok(ResponseBuilder::new().content_type($mime).body(
                             include_bytes!(
                                 concat!("../../static/", $path)
                             ).as_ref()
-                        )
+                        ))
                     }
                 )*
                 "style.css" => {
-                    ResponseBuilder::new().content_type(ContentType::CSS).body(
-                        grass::include!("style/style.scss")
+                    Ok(
+                        ResponseBuilder::new().content_type(
+                            ContentType::CSS
+                        ).body(
+                            grass::include!("style/style.scss")
+                        )
                     )
                 }
-                _ => unimplemented!()
+                _ => Err(RouteError::NotFound)
             }
         }
     }
@@ -53,11 +60,11 @@ macro_rules! assets {
 pub struct StyleCss;
 
 impl StyleCss {
-    pub fn link(
+    pub fn href(
         state: &RequestState
     ) -> impl AttributeValue + '_ {
         (
-            super::Root::link(state),
+            super::Root::href(state),
             SEGMENT,
             "/style.css",
         )

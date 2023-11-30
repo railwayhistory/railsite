@@ -5,8 +5,10 @@ use crate::state::{RequestState, ServerState};
 
 pub async fn serve(config: &Config, state: Arc<ServerState>) {
     httools::server::serve(config.listen, state, |state, request| async move {
-        let state = RequestState::from_request(&request, state.clone());
-        Ok(route::Root::process(request, &state))
+        match RequestState::from_request(&request, state.clone()) {
+            Ok(state) => Ok(route::Root::process(request, &state)),
+            Err(response) => Ok(response)
+        }
     }).await
 }
 

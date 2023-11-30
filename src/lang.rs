@@ -1,6 +1,6 @@
 use htmlfn::core::{AttributeValue, Target};
 //use raildata::types::date::{Date, Precision};
-//use raildata::types::LanguageCode;
+use raildata::types::LanguageCode;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Lang {
@@ -53,7 +53,6 @@ impl AttributeValue for Lang {
     }
 }
 
-/*
 impl From<Lang> for LanguageCode {
     fn from(lang: Lang) -> LanguageCode {
         match lang {
@@ -63,6 +62,7 @@ impl From<Lang> for LanguageCode {
     }
 }
 
+/*
 impl Lang {
     pub fn render_date(self, date: &Date, tmpl: &mut TemplateBuffer) {
         match self {

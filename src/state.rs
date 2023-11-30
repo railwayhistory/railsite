@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use headers::{Cookie, HeaderMapExt};
 use httools::request::{Request, RequestQuery};
-use httools::response::ResponseBuilder;
+use httools::response::{Response, ResponseBuilder};
 use raildata::catalogue::Catalogue;
 use raildata::load::load_tree;
 use raildata::load::report::{Failed, Stage};
@@ -94,36 +94,38 @@ pub struct RequestState {
 }
 
 impl RequestState {
-    pub fn from_request(request: &Request, server: Arc<ServerState>) -> Self {
+    pub fn from_request(
+        request: &Request, server: Arc<ServerState>
+    ) -> Result<Self, Response> {
         let query = request.query();
-        let lang = Self::determine_lang(request, &query);
-        RequestState {
+        let lang = Self::determine_lang(request, &query)?;
+        Ok(RequestState {
             server, query, lang
-        }
+        })
     }
 
     /// Determine the language.
     ///
-    /// Returns the language and prepares the builder.
+    /// Returns the language and whether it was changed.
     fn determine_lang(
         request: &Request,
         query: &RequestQuery,
-    ) -> Lang {
+    ) -> Result<Lang, Response> {
         // If we have a "lang" attribute in the query, we use that -- this is
         // how we switch languages.
         if let Some(lang) = query.get_first("lang") {
-            return Lang::from_code(lang)
+            return Ok(Lang::from_code(lang))
         }
 
         // If we have a "lang" cookie, we use that.
         if let Some(cookies) = request.headers().typed_get::<Cookie>() {
             if let Some(lang) = cookies.get("lang") {
-                return Lang::from_code(lang)
+                return Ok(Lang::from_code(lang))
             }
         }
 
         // Otherwise we will do the default for now.
-        Lang::default()
+        Ok(Lang::default())
     }
 
     pub fn store(&self) -> &FullStore {

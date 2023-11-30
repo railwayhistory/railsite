@@ -1,6 +1,6 @@
 use htmlfn::core::AttributeValue;
 use httools::request::{Request};
-use httools::response::{Response, ResponseBuilder};
+use httools::response::Response;
 use crate::page;
 use crate::page::Page;
 use crate::state::RequestState;
@@ -9,6 +9,12 @@ use crate::state::RequestState;
 //------------ Sub-modules ---------------------------------------------------
 
 pub mod assets;
+pub mod document;
+pub mod entity;
+pub mod line;
+pub mod point;
+pub mod source;
+pub mod structure;
 
 
 //------------ Root ----------------------------------------------------------
@@ -25,14 +31,24 @@ impl Root {
         };
         let mut path = path.iter();
 
-        match path.next() {
+        let res = match path.next() {
             Some(assets::SEGMENT) => assets::process(path),
-            //None => Home::process(state),
-            _ => not_found(request, state),
+            Some(document::SEGMENT) => document::process(path, state),
+            None => Home::process(state),
+            _ => Err(RouteError::NotFound),
+        };
+
+        match res {
+            Ok(res) => res,
+            Err(RouteError::NotFound) => {
+                page::error::not_found(state, request.path_str()).response(
+                    state.response().not_found()
+                )
+            }
         }
     }
 
-    fn link(state: &RequestState) -> impl AttributeValue + '_ {
+    fn href(state: &RequestState) -> impl AttributeValue + '_ {
         state.url_base()
     }
 }
@@ -43,21 +59,26 @@ impl Root {
 pub struct Home;
 
 impl Home {
-    fn process(_state: &RequestState) -> Response {
-        unimplemented!()
+    fn process(state: &RequestState) -> Result<Response, RouteError> {
+        Ok(page::home::standard(state).ok(state))
     }
 
-    pub fn link(state: &RequestState) -> impl AttributeValue + '_ {
-        Root::link(state)
+    pub fn href(state: &RequestState) -> impl AttributeValue + '_ {
+        Root::href(state)
     }
 }
 
 
-//------------ not_found -----------------------------------------------------
+//------------ Href ----------------------------------------------------------
 
-pub fn not_found(request: Request, state: &RequestState) -> Response {
-    page::error::not_found(state, request.path_str()).response(
-        ResponseBuilder::new().not_found()
-    )
+pub trait Href {
+    fn href(self, state: &RequestState) -> impl AttributeValue + '_;
+}
+
+
+//------------ RouteError ----------------------------------------------------
+
+enum RouteError {
+    NotFound,
 }
 

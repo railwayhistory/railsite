@@ -1,0 +1,162 @@
+# Simple terms
+#
+# These will end up in the i18n::term module.
+
+
+line::current:
+    en: Current Status
+    de: Aktueller Zustand
+line::route:
+    en: Route
+    de: Betriebsstellen
+
+line::property::category:
+    en: Category
+    de: Kategorie
+line::property::course:
+    en: Course
+    de: Verlauf
+line::property::electrified:
+    en: Electrification
+    de: Elektrifizierung
+line::property::gauge:
+    en: Gauge
+    de: Spurweite
+line::property::goods:
+    en: Goods service
+    de: Güterverkehr
+line::property::name:
+    en: Name
+    de: Bezeichnung
+line::property::operator:
+    en: Operator
+    de: Betriebsführer
+line::property::owner:
+    en: Owner
+    de: Eigentümer
+line::property::passenger:
+    en: Passenger service
+    de: Personenverkehr
+line::property::rails:
+    en: Number of rails
+    de: Anzahl Schienen
+line::property::status:
+    en: Status
+    de: Status
+line::property::tracks:
+    en: Tracks
+    de: Gleise
+
+line::category::de_hauptbahn:
+    en: main line (“Hauptbahn”)
+    de: Hauptbahn
+line::category::de_nebenbahn:
+    en: branch line (“Nebenbahn”)
+    de: Nebenbahn
+line::category::de_kleinbahn:
+    en: light railway (“Kleinbahn”)
+    de: Kleinbahn
+line::category::de_anschl:
+    en: industrial railway
+    de: Anschlussbahn
+line::category::de_bfgleis:
+    en: station track
+    de: Bahnhofsgleis
+line::category::de_strab:
+    en: tram
+    de: Straßenbahn
+line::category::gb_light:
+    en: light railway
+    de: Kleinbahn (“light railway”)
+
+line::electrified::none:
+    en: not electrified
+    de: nicht elektrifiziert
+line::electrified::ole:
+    en: OLE
+    de: Oberleitung
+line::electrified::rail:
+    en: third rail
+    de: Stromschiene
+line::electrified::rail4:
+    en: fourth rail
+    de: zwei Stromschienen
+line::electrified::ac16:
+    en: AC 16.7\u{202f}Hz
+    de: 16,7\u{202f}Hz ~
+line::electrified::ac25:
+    en: AC 25\u{202f}Hz
+    de: 25\u{202f}Hz ~
+line::electrified::ac50:
+    en: AC 50Hz
+    de: 50\u{202f}Hz ~
+line::electrified::tc50:
+    en: AC 50Hz 3-phase
+    de: 50\u{202f}Hz ∆
+line::electrified::dc:
+    en: DC
+    de: =
+
+line::goods::none:
+    en: none
+    de: keiner
+line::goods::limited:
+    en: limited
+    de: beschränkt 
+line::goods::full:
+    en: full
+    de: uneingeschränkt
+
+line::passenger::none:
+    en: none
+    de: keiner
+line::passenger::limited:
+    en: limited
+    de: beschränkt 
+line::passenger::historic:
+    en: heritage service
+    de: Museumsbetrieb
+line::passenger::seasonal:
+    en: seasonal service
+    de: saisonaler Betrieb
+line::passenger::tourist:
+    en: tourist service
+    de: touristischer Betrieb
+line::passenger::full:
+    en: full
+    de: uneingeschränkt
+
+line::status::none:
+    en: none
+    de: keiner
+line::status::planned:
+    en: planned
+    de: geplant
+line::status::construction:
+    en: under construction
+    de: im Bau
+line::status::open:
+    en: open
+    de: in Betrieb
+line::status::suspended:
+    en: suspended
+    de: gesperrt
+line::status::closed:
+    en: closed
+    de: stillgelegt
+line::status::removed:
+    en: removed
+    de: abgebaut
+line::status::released:
+    en: released
+    de: entwidmet
+
+
+nav::home:
+    en: Home
+    de: Start
+
+unknown:
+    en: unknown
+    de: unbekannt
+

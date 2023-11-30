@@ -1,9 +1,8 @@
 use htmlfn::core::{Content, Text};
 use htmlfn::html;
-use htmlfn::html::attr;
 use httools::hyper::Body;
 use httools::response::{ContentType, Response, ResponseBuilder};
-use crate::{i18n, route};
+use crate::{panel, route};
 use crate::state::RequestState;
 
 
@@ -15,8 +14,8 @@ pub trait Page: Into<Body> {
         builder.content_type(ContentType::HTML).body(self.into())
     }
 
-    fn ok(self) -> Response {
-        self.response(ResponseBuilder::new())
+    fn ok(self, state: &RequestState) -> Response {
+        self.response(state.response())
     }
 }
 
@@ -71,7 +70,7 @@ pub fn basic<'a>(
             html::meta::viewport(
                 "width=device-width, initial-scale=1.0, shrink-to-fit=no"
             ),
-            html::link::stylesheet(route::assets::StyleCss::link(state)),
+            html::link::stylesheet(route::assets::StyleCss::href(state)),
             head
         ),
         (
@@ -80,19 +79,6 @@ pub fn basic<'a>(
         ),
         body
     )
-}
-
-//------------ Nav -----------------------------------------------------------
-
-/// The navigation category a view lives in.
-#[allow(dead_code)]
-#[derive(Clone, Copy, Debug)]
-pub enum Nav {
-    Home,
-    Browse,
-    Map,
-    Documentation,
-    Other
 }
 
 
@@ -104,108 +90,16 @@ pub fn standard<'a>(
     title: impl Text + 'a,
     head: impl Content + 'a,
     scripts: impl Content + 'a,
-    nav: Nav,
     core: impl Content + 'a,
 ) -> impl Page + 'a {
     basic(
         state, title, head, scripts,
         (
-            html::nav::id("frame-header", 
-                html::div::class("frame-nav-bar", 
-                    html::div::class("frame-nav", 
-                        frame_nav_content(state, nav)
-                    )
-                )
-            ),
-            html::div::id("frame-core", core),
-            html::footer::id("frame-footer",
-                html::div::class("footer-content",
-                    footer_content(state)
-                )
-            ),
+            html::header::id("root-header", panel::header::standard(state)),
+            html::main::id("root-main", core),
+            html::footer::id("root-footer", panel::footer::standard(state)),
         )
     )
-}
-
-//============ Private Helpers ===============================================
-
-fn frame_nav_content(state: &RequestState, nav: Nav) -> impl Content + '_ {
-    (
-        html::a::class("frame-nav-brand", route::Home::link(state), (
-            html::img::attrs((
-                attr::src(route::assets::BrandLogo::link(state)),
-                attr::width(64),
-                attr::alt(i18n::term::nav::home(state)),
-            )),
-            html::button(
-                "button",
-                (
-                    attr::class("navbar-toggler"),
-                    attr::data("toggle", "collapse"),
-                    attr::data("target", "#frame-nav-content"),
-                    attr::aria("controls", "frame-nav-content"),
-                    attr::aria("expanded", "false"),
-                    attr::aria("label", i18n::term::nav::toggle_nav_bar(state)),
-                ),
-                html::span::class("navbar-toggler-icon", ())
-            ),
-            html::div::id_class(
-                "frame-nav-content",
-                ["frame-nav-content", "collapse"],
-                (
-                    html::ul::class("frame-nav-chapters", (
-                        html::li::attrs(
-                            matches!(nav, Nav::Home).then_some(
-                                attr::class("active")
-                            ),
-                            html::a(route::Home::link(state),
-                                i18n::term::nav::home(state)
-                            )
-                        ),
-                        html::li::attrs(
-                            matches!(nav, Nav::Browse).then_some(
-                                attr::class("active")
-                            ),
-                            html::a("#",
-                                i18n::term::nav::browse(state)
-                            )
-                        ),
-                        html::li::attrs(
-                            matches!(nav, Nav::Map).then_some(
-                                attr::class("active")
-                            ),
-                            html::a("#",
-                                i18n::term::nav::map(state)
-                            )
-                        ),
-                        html::li::attrs(
-                            matches!(nav, Nav::Documentation).then_some(
-                                attr::class("active")
-                            ),
-                            html::a("#",
-                                i18n::term::nav::documentation(state)
-                            )
-                        ),
-                    )),
-                    frame_nav_search(state),
-                    frame_nav_lang(state),
-                )
-            )
-        )),
-    )
-}
-
-fn frame_nav_search(_state: &RequestState) -> impl Content + '_ {
-    html::div::class("frame-nav-search", (
-    ))
-}
-
-fn frame_nav_lang(_state: &RequestState) -> impl Content + '_ {
-    ()
-}
-
-fn footer_content(_state: &RequestState) -> impl Content {
-    ()
 }
 
 

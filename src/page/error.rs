@@ -1,12 +1,12 @@
 use htmlfn::html;
 use crate::state::RequestState;
 use super::frame;
-use super::frame::Page;
 
 
-pub fn not_found<'a>(state: &'a RequestState, path: &'a str) -> impl Page + 'a {
+pub fn not_found<'a>(
+    state: &'a RequestState, path: &'a str
+) -> impl frame::Page + 'a {
     frame::standard(state, "Not Found", (), (),
-        super::frame::Nav::Other,
         (
             html::h1("Not Found"),
             html::p((
