@@ -8,13 +8,16 @@ use crate::state::RequestState;
 pub fn title<'a>(
     point: point::Document<'a>, state: &'a RequestState
 ) -> impl Text + 'a {
-    point.data().name(state.lang().into())
-}
-
-pub fn headline<'a>(
-    point: point::Document<'a>, state: &'a RequestState
-) -> impl Content + 'a {
-    html::h1(point.data().name(state.lang().into()))
+    let lang = state.lang().into();
+    for event in point.data().events.iter().rev() {
+        if let Some(name) = event.name(lang) {
+            return name
+        }
+        if let Some(name) = event.designation(lang) {
+            return name
+        }
+    }
+    point.key().as_str()
 }
 
 pub fn link<'a>(

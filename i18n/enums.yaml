@@ -1,0 +1,269 @@
+document_type:
+    enum: raildata::document::common::DocumentType
+    variants:
+        Line:
+            de: Strecke
+            en: Line
+        Entity:
+            de: Organisation
+            en: Entity
+        Path:
+            de: Pfad
+            en: Path
+        Point:
+            de: Betriebsstelle
+            en: Point
+        Source:
+            de: Quelle
+            en: Source
+        Structure:
+            de: Kunstbau
+            en: Structure
+point::category:
+    enum: raildata::document::point::Category
+    variants:
+        Border:
+            en: border point
+            de: Grenzpunkt
+        DeAbzw:
+            en: junction (Abzweigstelle)
+            de: Abzweigstelle
+        DeAnst:
+            en: siding (Anschlussstelle)
+            de: Anschlussstelle
+        DeAwanst:
+            en: lock-in siding (Ausweichanschlussstelle)
+            de: Ausweichanschlussstelle
+        DeBf:
+            en: station (Bahnhof)
+            de: Bahnhof
+        DeBft:
+            en: station part (Bahnhofsteil)
+            de: Bahnhofsteil
+        DeBk:
+            en: block post (Blockstelle)
+            de: Blockstelle
+        DeDkst:
+            en: protection post (Deckungsstelle)
+            de: Deckungsstelle
+        DeGlgr:
+            en: track group (Gleisgruppe)
+            de: Gleisgruppe
+        DeHp:
+            en: stop (Haltepunkt)
+            de: Haltepunkt
+        DeHst:
+            en: combined stop (Haltestelle)
+            de: Haltestelle
+        DeKr:
+            en: passing loop (Kreuzungsstelle)
+            de: Kreuzungsstelle
+        DeKrbf:
+            en: passing station (Kreuzungsbahnhof)
+            de: Kreuzungsbahnhof
+        DeKrst:
+            en: passing loop (Kreuzungsstelle)
+            de: Kreuzungsstelle
+        DeLdst:
+            en: loading point (Ladestelle)
+            de: Ladestelle
+        DeMuseum:
+            en: museum
+            de: Museum
+        DePo:
+            en: level-crossing post
+            de: Posten
+        DeStrw:
+            en: change of line
+            de: Streckenwechsel
+        DeStw:
+            en: signal box
+            de: Stellwerk
+        DeUehst:
+            en: passing loop (Überholungsstelle)
+            de: Überholungsstelle
+        DeUest:
+            en: crossover (Überleitstelle)
+            de: Überleitstelle
+        DeAhst:
+            en: “Abfertigungshilfsstelle”
+            de: Abfertigungshilfsstelle
+        DeGnst:
+            en: “Güternebenstelle”
+            de: Güternebenstelle
+        DeGa:
+            en: goods expedition
+            de: Güterabfertigung
+        DeUst:
+            en: trans-shippment point
+            de: Umschlagstelle
+        DeTp:
+            en: tariff point
+            de: Tarifpunkt
+        DeEGr:
+            en: change of property
+            de: Eigentumsgrenze
+        DeGp:
+            en: border point
+            de: Grenzpunkt
+        DeLGr:
+            en: state border
+            de: Landesgrenze
+        DeRBGr:
+            en: regional division border
+            de: Regionalbereichsgrenze
+
+        DkB:
+            en: ticket sales point (Billetssalgssted)
+            de: Billetverkaufstelle (Billetssalgssted)
+        DkGr:
+            en: border
+            de: Grenzpunkt
+        DkSmd:
+            en: lock-in siding
+            de: Ausweichanschlussstelle
+        DkSud:
+            en: siding
+            de: Anschlussstelle
+        DkSt:
+            en: station
+            de: Bahnhof (station)
+        DkT:
+            en: stop (trinbræt)
+            de: Haltepunkt (trinbræt)
+        DkTs:
+            en: technical station
+            de: Betriebsbahnhof (teknisk station)
+        DkVm:
+            en: VM station
+            de: VM-Bahnhof
+
+        GbHalt:
+            en: halt
+            de: Haltepunkt
+        GbJn:
+            en: junction
+            de: Abzweig (junction)
+        GbSt:
+            en: station
+            de: Bahnhof (station)
+        GbTep:
+            en: token exchange point (TEP)
+            de: Tokenwechselpunkt (token exchange point, TEP)
+
+        NlAansl:
+            en: junction (aansluiting)
+            de: Abzweigstelle (aansluiting)
+        NlBrug:
+            en: bridge
+            de: Brücke
+        NlGem:
+            en: goods station (goederenemplacement)
+            de: Güterbahnhof (goederenemplacement)
+        NlH:
+            en: stop
+            de: Haltepunkt
+        NlKnp:
+            en: node station
+            de: Knotenbahnhof
+        NlOlp:
+            en: crossing (overloopwissel)
+            de: Überleitstelle (overloopwissel)
+        NlSt:
+            en: station
+            de: Bahnhof
+
+        NoS:
+            en: station
+            de: Bahnhof
+        NoSp:
+            en: Sp
+            de: Sp
+        NoHp:
+            en: stop
+            de: Haltepunkt
+
+point::code_type:
+    enum: raildata::document::point::CodeType
+    variants:
+        Plc:
+            en: PLC
+            de: PLC
+        DeDs100:
+            en: DS100
+            de: DS100
+        DeDstnr:
+            en: Office number
+            de: Dienststellennummer
+        DeLknr:
+            en: Punch card number
+            de: Lochkartennummer
+        DeVbl:
+            en: VBL
+            de: VBL
+        DkRef:
+            en: Code
+            de: Code
+        NlAfk:
+            en: Abbr.
+            de: Abk.
+        NoFs:
+            en: Radio code
+            de: Fernschreibkürzel
+        NoNjk:
+            en: NJK
+            de: NJK
+        NoNsb:
+            en: NSB
+            de: NSB
+
+
+point::de_rang:
+    enum: raildata::document::point::DeRang
+    variants:
+        I:
+            en: I
+            de: I
+        Ii:
+            en: II
+            de: II
+        Iii:
+            en: III
+            de: III
+        Iiia:
+            en: IIIa
+            de: IIIa
+        Iiib:
+            en: IIIb
+            de: IIIb
+        Iv:
+            en: IV
+            de: IV
+        V:
+            en: V
+            de: V
+        Vi:
+            en: VI
+            de: VI
+        U:
+            en: dependent
+            de: unselbständig
+        S:
+            en: independent
+            de: selbständig
+
+point::service:
+    enum: raildata::document::point::Service
+    variants:
+        Full:
+            en: full
+            de: voll
+        None:
+            en: none
+            de: keiner
+        Passenger:
+            en: passenger service
+            de: Personenverkehr
+        Goods:
+            en: goods service
+            de: Güterverkehr

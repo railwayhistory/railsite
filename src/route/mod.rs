@@ -9,10 +9,12 @@ use crate::state::RequestState;
 //------------ Sub-modules ---------------------------------------------------
 
 pub mod assets;
+pub mod aux;
 pub mod document;
 pub mod entity;
 pub mod line;
 pub mod point;
+pub mod region;
 pub mod source;
 pub mod structure;
 
@@ -34,8 +36,8 @@ impl Root {
         let res = match path.next() {
             Some(assets::SEGMENT) => assets::process(path),
             Some(document::SEGMENT) => document::process(path, state),
+            Some(other) => aux::process(other, path, state),
             None => Home::process(state),
-            _ => Err(RouteError::NotFound),
         };
 
         match res {

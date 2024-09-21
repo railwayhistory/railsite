@@ -14,12 +14,14 @@ fn main() {
     let mut target = String::new();
 
     terms(&mut target);
+    enums(&mut target);
 
     let out_dir = env::var_os("OUT_DIR").unwrap();
     let dest_path = Path::new(&out_dir).join("i18n.rs");
     fs::write(&dest_path, &target).unwrap();
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=i18n/terms.yaml");
+    println!("cargo:rerun-if-changed=i18n/enums.yaml");
 }
 
 
@@ -28,7 +30,7 @@ fn main() {
 type Terms = HashMap<String, HashMap<String, String>>;
 
 #[derive(Default)]
-struct Module {
+struct TermsModule {
     mods: HashMap<String, Box<Self>>,
     funcs: HashMap<String, HashMap<String, String>>,
 }
@@ -38,7 +40,7 @@ fn terms(target: &mut String) {
         &fs::read_to_string("i18n/terms.yaml").unwrap()
     ).unwrap();
 
-    let mut output = Module::default();
+    let mut output = TermsModule::default();
     for (ident, content) in input {
         let mut ident = ident.split("::").collect::<Vec<_>>();
         let func = ident.pop().unwrap();
@@ -46,7 +48,7 @@ fn terms(target: &mut String) {
         let mut ident = ident.into_iter();
         while let Some(word) = ident.next() {
             module = module.mods.entry(word.into()).or_insert_with(|| {
-                Module::default().into()
+                TermsModule::default().into()
             })
         }
         module.funcs.insert(func.into(), content);
@@ -57,7 +59,7 @@ fn terms(target: &mut String) {
     writeln!(target, "}}");
 }
 
-fn term_module(module: &Module, target: &mut String) {
+fn term_module(module: &TermsModule, target: &mut String) {
     for (name, module) in &module.mods {
         writeln!(target, "pub mod {} {{", name);
         term_module(module, target);
@@ -77,6 +79,83 @@ fn term_module(module: &Module, target: &mut String) {
                 "{}::{}{} => \"{}\",",
                 LANG, &lang[0..1].to_uppercase(), &lang[1..], term
             );
+        }
+        writeln!(target, "    }}\n}}");
+    }
+}
+
+
+//------------ enums ---------------------------------------------------------
+
+type Enums = HashMap<String, Enum>;
+
+#[derive(serde::Deserialize)]
+struct Enum {
+    #[serde(rename = "enum")]
+    enum_path: String,
+
+    variants: HashMap<String, HashMap<String, String>>,
+}
+
+#[derive(Default)]
+struct EnumsModule {
+    mods: HashMap<String, Box<Self>>,
+    funcs: HashMap<String, Enum>,
+}
+
+fn enums(target: &mut String) {
+    let input = serde_yaml::from_str::<Enums>(
+        &fs::read_to_string("i18n/enums.yaml").unwrap()
+    ).unwrap();
+
+    let mut output = EnumsModule::default();
+    for (ident, content) in input {
+        let mut ident = ident.split("::").collect::<Vec<_>>();
+        let func = ident.pop().unwrap();
+        let mut module = &mut output;
+        let mut ident = ident.into_iter();
+        while let Some(word) = ident.next() {
+            module = module.mods.entry(word.into()).or_insert_with(|| {
+                EnumsModule::default().into()
+            })
+        }
+        module.funcs.insert(func.into(), content);
+    }
+
+    writeln!(target, "pub mod enums {{");
+    enums_module(&output, target);
+    writeln!(target, "}}");
+}
+
+fn enums_module(module: &EnumsModule, target: &mut String) {
+    for (name, module) in &module.mods {
+        writeln!(target, "pub mod {} {{", name);
+        enums_module(module, target);
+        writeln!(target, "}}");
+    }
+
+    for (name, content) in &module.funcs {
+        writeln!(target,
+            "pub fn {}(\
+                 value: {},\
+                 state: &{},\
+             ) -> &'static str {{\
+                 match value {{",
+            name, content.enum_path, REQUEST_STATE,
+        );
+        for (variant, value) in &content.variants {
+            writeln!(target,
+                "        {}::{} => {{", content.enum_path, variant
+                );
+            writeln!(target, "            match state.lang() {{");
+            for (lang, term) in value {
+                writeln!(target,
+                    "                {}::{}{} => \"{}\",",
+                    LANG, &lang[0..1].to_uppercase(), &lang[1..], term
+                );
+            }
+            writeln!(target, "            }}");
+            writeln!(target, "        }}");
         }
         writeln!(target, "    }}\n}}");
     }

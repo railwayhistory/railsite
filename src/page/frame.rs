@@ -2,7 +2,8 @@ use htmlfn::core::{Content, Text};
 use htmlfn::html;
 use httools::hyper::Body;
 use httools::response::{ContentType, Response, ResponseBuilder};
-use crate::{panel, route};
+use crate::page::panels;
+use crate::route;
 use crate::state::RequestState;
 
 
@@ -24,7 +25,7 @@ pub trait Page: Into<Body> {
 
 /// The most basic frame.
 ///
-/// The language will of the page will be taken from `state`.  The header
+/// The language of the page will be taken from `state`.  The header
 /// will contain a title with the given text and additional head elements
 /// from `head`. All JavaScript links should go into `scripts`.
 /// Finally, the page’s body is taken from `body`.
@@ -95,9 +96,21 @@ pub fn standard<'a>(
     basic(
         state, title, head, scripts,
         (
-            html::header::id("root-header", panel::header::standard(state)),
-            html::main::id("root-main", core),
-            html::footer::id("root-footer", panel::footer::standard(state)),
+            html::header::id("root-header",
+                html::div::class("root-area",
+                    panels::header::standard(state)
+                )
+            ),
+            html::main::id("root-main",
+                html::div::class("root-area",
+                    core
+                )
+            ),
+            html::footer::id("root-footer",
+                html::div::class("root-area",
+                    panels::footer::standard(state)
+                )
+            ),
         )
     )
 }

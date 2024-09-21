@@ -2,6 +2,82 @@
 #
 # These will end up in the i18n::term module.
 
+aux::countries::title:
+    en: Country Index
+    de: Länderindex
+aux::search::title:
+    en: Search
+    de: Suche
+aux::search::more:
+    en: Additional items found. Please limit search further.
+    de: Weitere Suchergebnisse. Bitte Suchbegriff verfeinern.
+
+entity::subpage::overview:
+    en: Overview
+    de: Übersicht
+entity::subpage::lines:
+    en: Lines
+    de: Strecken
+entity::properties:
+    en: Properties
+    de: Eigenschaften
+entity::property::domicile:
+    en: Domicile
+    de: Sitz
+entity::property::name:
+    en: Name
+    de: Name
+entity::property::owner:
+    en: Owner
+    de: Eigentümer
+entity::property::short_name:
+    en: Short name
+    de: Kurzname
+entity::property::status:
+    en: Status
+    de: Status
+entity::property::successor:
+    en: Successor
+    de: Nachfolger
+entity::property::superior:
+    en: Part of
+    de: Teil von
+
+entity::status::forming:
+    en: Forming
+    de: in Gründung
+entity::status::open:
+    en: active
+    de: aktiv
+entity::status::closed:
+    en: closed
+    de: erloschen
+
+header::search::placeholder:
+    en: Search …
+    de: Suche …
+header::search::submit:
+    en: Search
+    de: Suche
+
+home::logo:
+    en: logo
+    de: Logo
+home::button::countries:
+    en: Country Index
+    de: Länderindex
+home::button::map:
+    en: Map
+    de: Karte
+home::button::about:
+    en: About
+    de: Informationen
+home::intro::text:
+    en: A collection of facts about the history of the railway.
+    de: Eine Sammlung von Fakten zur Geschichte der Eisenbahnen.
+home::intro::more:
+    en: More …
+    de: Mehr …
 
 line::current:
     en: Current Status
@@ -134,7 +210,7 @@ line::status::planned:
     de: geplant
 line::status::construction:
     en: under construction
-    de: im Bau
+    de: in Bau
 line::status::open:
     en: open
     de: in Betrieb
@@ -150,6 +226,66 @@ line::status::removed:
 line::status::released:
     en: released
     de: entwidmet
+
+
+panel::search::placeholder:
+    en: Search for places, lines, companies, etc.
+    de: Suche nach Betriebsstellen, Strecken, Unternehmen, etc.
+panel::search::submit:
+    en: Search
+    de: Suche
+
+
+point::current:
+    en: Current Status
+    de: Aktueller Zustand
+
+point::property::category:
+    en: Category
+    de: Kategorie
+point::property::de_name16:
+    en: Name (16 characters)
+    de: Name (16 Zeichen)
+point::property::de_rang:
+    en: Rank
+    de: Rangklasse
+point::property::designation:
+    en: Designation
+    de: Bezeichnung
+point::property::location:
+    en: Location
+    de: Lage
+point::property::name:
+    en: Name
+    de: Name
+point::property::public_name:
+    en: Public name
+    de: Öffentlicher Name
+point::property::short_name:
+    en: Short name
+    de: Kurzname
+point::property::status:
+    en: Status
+    de: Status
+point::property::superior:
+    en: Superior
+    de: Mutterbahnhof
+
+point::status::planned:
+    en: planned
+    de: geplant
+point::status::construction:
+    en: under construction
+    de: in Bau
+point::status::open:
+    en: open
+    de: in Betrieb
+point::status::suspended:
+    en: suspended
+    de: außer Betrieb
+point::status::closed:
+    en: closed
+    de: aufgelassen
 
 
 nav::home:

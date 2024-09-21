@@ -23,6 +23,13 @@ impl Lang {
         }
     }
 
+    pub fn name(self) -> &'static str {
+        match self {
+            Lang::De => "Deutsch",
+            Lang::En => "English",
+        }
+    }
+
     pub fn cookie(self) -> &'static str {
         match self {
             Lang::De => "lang=de; path=/; Max-Age=2592000;  HttpOnly",

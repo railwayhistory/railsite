@@ -1,42 +1,34 @@
 use htmlfn::html;
-use htmlfn::core::{Content, Text};
-use htmlfn::core::{display, iter};
-use htmlfn::utils::join;
+use htmlfn::core::Content;
+use htmlfn::utils::{display, iter, join};
 use raildata::document::line;
-use crate::{i18n, panel};
-use crate::state::RequestState;
+use crate::i18n;
+use crate::page::{frame, snip};
 use crate::route::Href;
+use crate::state::RequestState;
+use super::property;
 
-mod property;
 
-
-//------------ title/headline ------------------------------------------------
-
-pub fn title<'a>(
+pub fn page<'a>(
     line: line::Document<'a>, state: &'a RequestState
-) -> impl Text + 'a {
-    let jurisdiction = line.data().jurisdiction();
-    (
-        line.data().code(),
-        ". ",
-        line.data().points.first_junction(
-            state.store()
-        ).data().name_in_jurisdiction(jurisdiction),
-        " – ",
-        line.data().points.last_junction(
-            state.store()
-        ).data().name_in_jurisdiction(jurisdiction),
+) -> impl frame::Page + 'a {
+    frame::standard(state, snip::line::title(line, state), (), (),
+        (
+            headline(line, state),
+            current(line, state),
+            route(line, state),
+        )
     )
 }
 
 
-pub fn headline<'a>(
+fn headline<'a>(
     line: line::Document<'a>, state: &'a RequestState
 ) -> impl Content + 'a {
     let jurisdiction = line.data().jurisdiction();
     html::h1::class("line-headline", (
         html::span::class("line-headline-code", (
-            line.data().code(), ". "
+            line.data().code().as_str(), ". "
         )),
         html::span::class("line-headline-course", (
             line.data().points.first_junction(
@@ -177,7 +169,7 @@ pub fn current<'a>(
                 html::dd(current_value(line, owner, state, |owner| {(
                     owner.as_ref().map(|owner| {
                         join(", ", owner.iter().map(|owner| {
-                            panel::entity::link(
+                            snip::entity::link(
                                 owner.document(state.store()),
                                 state
                             )
@@ -195,7 +187,7 @@ pub fn current<'a>(
                 html::dd(current_value(line, operator, state, |operator| {(
                     operator.as_ref().map(|operator| {
                         join(", ", operator.iter().map(|operator| {
-                            panel::entity::link(
+                            snip::entity::link(
                                 operator.document(state.store()),
                                 state
                             )
@@ -231,12 +223,12 @@ where
                     let jurisdiction = line.data().jurisdiction();
                     (
                         html::dt((
-                            panel::point::link(
+                            snip::point::link(
                                 item.0.start_point(line.data(), state.store()),
                                 jurisdiction, state
                             ),
                             " – ",
-                            panel::point::link(
+                            snip::point::link(
                                 item.0.end_point(line.data(), state.store()),
                                 jurisdiction, state
                             ),
@@ -270,7 +262,7 @@ pub fn route<'a>(
                         (
                             // location
                             html::td(
-                                point.data().location(
+                                point.data().line_location(
                                     link
                                 ).map(|(location, changed)| {
                                     (location, changed.then(|| "*"))
@@ -293,7 +285,32 @@ pub fn route<'a>(
                                         jurisdiction
                                     )
                                 )
-                            )
+                            ),
+
+                            // connections
+                            html::td::class("line-route-connections",
+                                if point.meta().junction {
+                                    Some(html::ul(
+                                        iter(
+                                            point.xrefs().lines.iter().filter(
+                                                move |line| **line != link
+                                            ).map(|line| {
+                                                html::li(
+                                                    snip::line::link(
+                                                        line.document(
+                                                            state.store()
+                                                        ),
+                                                        state
+                                                    )
+                                                )
+                                            })
+                                        )
+                                    ))
+                                }
+                                else {
+                                    None
+                                }
+                            ),
                         )
                     )
                 })

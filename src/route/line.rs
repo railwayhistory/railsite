@@ -29,3 +29,12 @@ impl Href for LineLink {
     }
 }
 
+
+//------------ LineDocument --------------------------------------------------
+
+impl Href for LineDocument<'_> {
+    fn href(self, state: &RequestState) -> impl AttributeValue + '_ {
+        self.data().link().href(state)
+    }
+}
+

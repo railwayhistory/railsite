@@ -1,5 +1,5 @@
 use htmlfn::core::Content;
-use htmlfn::core::display;
+use htmlfn::utils::display;
 use raildata::document::line::data::{
     Category, Goods, Electrified, Passenger, Status
 };
