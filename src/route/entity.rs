@@ -49,7 +49,7 @@ impl Href for entity::Link {
 
 impl<'a> Href for entity::Document<'a> {
     fn href(self, state: &RequestState) -> impl AttributeValue + '_ {
-        self.data().link().href(state)
+        self.link().href(state)
     }
 }
 

@@ -1,8 +1,31 @@
 use htmlfn::html;
 use htmlfn::core::Content;
 use htmlfn::html::attr;
+use htmlfn::utils::iter;
 use crate::{i18n, route};
+use crate::lang::Lang;
 use crate::state::RequestState;
+
+//------------ lang_select ---------------------------------------------------
+
+pub fn lang_select(state: &RequestState) -> impl Content + '_ {
+    html::div::class("panel-lang-select", (
+        html::p::class("current",
+            html::a("#", state.lang().code())
+        ),
+        html::ul::class("menu",
+            iter(Lang::all().map(|lang| {
+                html::li::class(
+                    if lang == state.lang() { "active" } else { "" },
+                    html::a(("?lang=", lang.code()), (
+                        html::span::class("code", lang.code()),
+                        html::span::class("name", lang.name()),
+                    ))
+                )
+            }))
+        ),
+    ))
+}
 
 //------------ search_bar ----------------------------------------------------
 

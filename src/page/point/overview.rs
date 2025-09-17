@@ -32,7 +32,7 @@ pub fn current<'a>(
     let current = &point.meta().current;
     (
         html::h2(i18n::term::point::current(state)),
-        html::dl::class("point-current", (
+        html::dl::class("section-current", (
             // Status
             current.status.as_ref().map(|status| {(
                 html::dt(i18n::term::point::property::status(state)),

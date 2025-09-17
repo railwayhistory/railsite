@@ -74,5 +74,6 @@ impl StyleCss {
 assets!(
     struct BrandLogo: ("img/logo64-blue.svg", ContentType::SVG),
     struct FrontLogo: ("img/logo500-beige.svg", ContentType::SVG),
+    struct BasicScript: ("js/basic.js", ContentType::JS),
 );
 

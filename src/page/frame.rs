@@ -75,7 +75,7 @@ pub fn basic<'a>(
             head
         ),
         (
-            //basic_scripts(state),
+            html::script::src(route::assets::BasicScript::href(state)),
             scripts,
         ),
         body

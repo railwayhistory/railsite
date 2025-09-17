@@ -34,7 +34,7 @@ impl Href for structure::Link {
 
 impl<'a> Href for structure::Document<'a> {
     fn href(self, state: &RequestState) -> impl AttributeValue + '_ {
-        self.data().link().href(state)
+        self.link().href(state)
     }
 }
 

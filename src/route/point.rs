@@ -34,6 +34,6 @@ impl Href for point::Link {
 
 impl<'a> Href for point::Document<'a> {
     fn href(self, state: &RequestState) -> impl AttributeValue + '_ {
-        self.data().link().href(state)
+        self.link().href(state)
     }
 }

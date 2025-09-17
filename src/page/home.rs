@@ -1,9 +1,7 @@
 use htmlfn::html;
 use htmlfn::html::attr;
 use htmlfn::core::Content;
-use htmlfn::utils::iter;
 use crate::{i18n, route};
-use crate::lang::Lang;
 use crate::page::{frame, panels};
 use crate::state::RequestState;
 
@@ -59,7 +57,7 @@ pub fn main(state: &RequestState) -> impl Content + '_ {
                 )),
             )),
             html::div::class("home-main-lang", 
-                lang_select(state)
+                panels::misc::lang_select(state)
             ),
         )),
         html::div::class("home-main-search", (
@@ -67,24 +65,5 @@ pub fn main(state: &RequestState) -> impl Content + '_ {
             html::div::id("home-main-search-results", ()),
         )),
     ))
-}
-
-fn lang_select(state: &RequestState) -> impl Content + '_ {
-    (
-        html::p::class("current",
-            html::a("#", state.lang().code())
-        ),
-        html::ul::class("menu",
-            iter(Lang::all().map(|lang| {
-                html::li::class(
-                    if lang == state.lang() { "active" } else { "" },
-                    html::a(("?lang=", lang.code()), (
-                        html::span::class("code", lang.code()),
-                        html::span::class("name", lang.name()),
-                    ))
-                )
-            }))
-        ),
-    )
 }
 

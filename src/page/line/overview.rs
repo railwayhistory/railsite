@@ -247,7 +247,7 @@ where
 pub fn route<'a>(
     line: line::Document<'a>, state: &'a RequestState
 ) -> impl Content + 'a {
-    let link = line.data().link();
+    let link = line.link();
     let jurisdiction = line.data().jurisdiction();
     (
         html::h2(i18n::term::line::route(state)),

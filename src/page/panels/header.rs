@@ -5,6 +5,7 @@ use htmlfn::html::attr;
 use htmlfn::core::Content;
 use crate::{i18n, route};
 use crate::state::RequestState;
+use crate::page::panels;
 
 
 //------------ standard ------------------------------------------------------
@@ -20,24 +21,34 @@ pub fn standard(state: &RequestState) -> impl Content + '_ {
                 ))
             )
         ),
-        html::form(
-            (
-                attr::class("panel-header-search"),
-                attr::method("get"),
-                attr::action(route::aux::Search::href(state)),
-            ),
-            (
-                html::input((
-                    attr::name("q"),
-                    attr::placeholder(
-                        i18n::term::header::search::placeholder(state)
+        html::div::class("panel-header-control", (
+            html::button("button", attr::class("hamburger-button"), "≡"),
+            html::div::class("hamburger-controlled", (
+                html::a::class("hamburger-close", "#", "×"),
+                html::form(
+                    (
+                        attr::class("panel-header-search"),
+                        attr::method("get"),
+                        attr::action(route::aux::Search::href(state)),
                     ),
-                )),
-                html::button(
-                    "submit", (), i18n::term::header::search::submit(state)
+                    (
+                        html::input((
+                            attr::name("q"),
+                            attr::placeholder(
+                                i18n::term::header::search::placeholder(state)
+                            ),
+                        )),
+                        html::button(
+                            "submit", (),
+                            i18n::term::header::search::submit(state)
+                        ),
+                    )
                 ),
-            )
-        ),
+                html::div::class("panel-header-lang",
+                    panels::misc::lang_select(state)
+                ),
+            )),
+        )),
     )
 }
 

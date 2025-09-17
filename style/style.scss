@@ -1,41 +1,47 @@
 // The Railsite Style Sheet
 //
 
+//------------ SASS Variables ------------------------------------------------
+
+// The width breakpoint between mobile and desktop layout.
+$max-width-small: 720px;
+
+
+//------------ CSS Variables -------------------------------------------------
+
 :root {
-        --color: #2e3436;
-        --background-color: #fff;
-        --background-hover-color: #eee;
-        --active-background-color: #def;
-        --active-background-hover-color: #cde;
-        --cell-color: #555;
-        --cell-background-color: #eee;
-        --cell-background-hover-color: #ddd;
-        --header-background-color: #1d3053;
-        --header-color: #d1bca8;
-        --border-color: #aaaaaa;
-        --focus-border-color: #2a4577;
-        --root-h-padding: 2rem;
+    --color: #2e3436;
+    --background-color: #fff;
+    --background-hover-color: #eee;
+    --active-background-color: #def;
+    --active-background-hover-color: #cde;
+    --cell-color: #555;
+    --cell-background-color: #eee;
+    --cell-background-hover-color: #ddd;
+    --header-background-color: #1d3053;
+    --header-color: #d1bca8;
+    --border-color: #aaaaaa;
+    --focus-border-color: #2a4577;
+    --root-h-padding: 2rem;
 
+    @media(prefers-color-scheme: dark) {
+        color-scheme: dark;
+        --color: #fbfbfe;
+        --background-color: #1b1c22;
+        --background-hover-color: #ddd;
+        --cell-color: #ddd;
+        --cell-background-color: #333;
+        --cell-background-hover-color: #444;
+        --border-color: #888888;
+    }
+
+    @media only screen and (max-width: $max-width-small) {
+        --root-h-padding: 0.5rem;
+    }
 }
 
-@media(prefers-color-scheme: dark) {
-        :root {
-                color-scheme: dark;
-                --color: #fbfbfe;
-                --background-color: #1b1c22;
-                --background-hover-color: #ddd;
-                --cell-color: #ddd;
-                --cell-background-color: #333;
-                --cell-background-hover-color: #444;
-                --border-color: #888888;
-        }
-}
 
-@media only screen and (max-width: 720px) {
-        :root {
-                --root-h-padding: 0.2rem;
-        }
-}
+//------------ Page Layout ---------------------------------------------------
 
 body {
         margin: 0;
@@ -49,37 +55,30 @@ body > * {
         padding-right: var(--root-h-padding);
 }
 
-.root-area {
+%root-area {
         max-width: 50rem;
         margin: 0 auto;
 }
 
+
+//------------ Page Header ---------------------------------------------------
+
 body > header {
-        background-color: var(--header-background-color);
-        border-bottom: solid 2px var(--header-color);
+    background-color: var(--header-background-color);
+    border-bottom: solid 2px var(--header-color);
 
-        padding-top: 0.2rem;
+    padding-top: 0.2rem;
 }
 
-body > main {
-        padding-top: 0.2rem;
-        padding-bottom: 0.2rem;
-        border-top: 2px solid var(--header-background-color);
-}
+body > header > div {
+    @extend %root-area;
 
-body > footer {
-        padding-top: 0.2rem;
-}
-
-
-//--- Header
-
-#root-header > .root-area {
     display: grid;
     grid-template-columns: auto max-content;
     width: 100%;
     padding-bottom: 0.2rem;
 }
+
 .panel-header-brand {
     margin: 0.3rem 0;
 }
@@ -89,27 +88,139 @@ body > footer {
 .panel-header-brand > a > img {
     display: block;
 }
-.panel-header-search {
-    margin: 0.1rem 0;
+
+@media only screen and (min-width: $max-width-small) {
+    .panel-header-control > * > * {
+        display: inline-block;
+        margin-left: 0.5rem;
+    }
+    .panel-header-control .hamburger-button {
+        display: none;
+    }
+
+    .panel-header-search {
+        margin: 0.1rem 0;
+    }
+    .panel-header-search > * {
+        border-color: var(--border-color);
+        border-width: 1px;
+        padding: 0.2rem;
+    }
+    .panel-header-search > input {
+        border-style: solid;
+        border-radius: 0.2rem 0 0 0.2rem;
+    }
+    .panel-header-search > input:focus-visible {
+        outline: none;
+        border-color: var(--focus-border-color);
+    }
+    .panel-header-search > button {
+        border-style: solid solid solid none;
+        border-radius: 0 0.2rem 0.2rem 0;
+        color: var(--cell-color);
+    }
+
+    .panel-header-lang {
+        font-size: 10pt;
+        position: relative;
+    }
+    .panel-header-lang .current {
+        margin: 0.1rem 0;
+    }
+    .panel-header-lang .current > a {
+        border: 1px solid var(--border-color);
+        border-radius: 0.2rem;
+        background: var(--cell-background-color);
+        color: var(--cell-color);
+        padding: 0.2rem;
+        text-transform: uppercase;
+        text-decoration: none;
+    }
+    .panel-header-lang .current > a:after {
+        content: "▾";
+        padding-left: 0.3rem;
+    }
+    .panel-header-lang .current > a:hover {
+        background-color: var(--cell-background-hover-color);
+    }
+    .panel-header-lang .menu {
+        display: none;
+        position: absolute;
+        margin: 0.2rem 0;
+        background-color: var(--background-color);
+        right: 0;
+        border: 1px solid var(--border-color);
+        border-radius: 0.1rem;
+        padding: 0.2rem 0;
+        list-style: none;
+    }
+    .panel-header-lang .visible {
+        display: block;
+    }
+    .panel-header-lang .menu a {
+        display: block;
+        text-decoration: none;
+        padding: 0.1rem 1rem;
+        color: var(--color);
+        white-space: nowrap;
+        text-align: left;
+    }
+    .panel-heaer-lang .menu .active a {
+        background-color: var(--active-background-color);
+    }
+    .panel-header-lang .menu a:hover {
+        background-color: var(--background-hover-color);
+    }
+    .panel-header-lang .menu .active a:hover {
+        background-color: var(--active-background-hover-color) !important;
+    }
+    .panel-header-lang .menu a .code {
+        display: inline-block;
+        width: 1.7em;
+        font-variant: small-caps;
+    }
 }
-.panel-header-search > * {
-    border-color: var(--border-color);
-    border-width: 1px;
-    padding: 0.2rem;
+@media only screen and (max-width: $max-width-small) {
+    .panel-header-control .hamburger-controlled {
+        display: none;
+    }
+    .panel-header-control .hamburger-controlled.visible {
+        display: block;
+        position: absolute;
+        left: 0;
+        width: 100%;
+        background-color: var(--background-color);
+        z-index: 1000;
+    }
+    .panel-header-control .hamburger-button {
+        display: inline-block;
+        margin-top: 0.1rem;
+        padding: 0 0.5rem;
+        font-size: 14pt;
+        background-color: var(--header-background-color);
+        border: 1px solid var(--header-color);
+        color: var(--header-color);
+        border-radius: 0.2rem;
+        font-weight: bold;
+    }
 }
-.panel-header-search > input {
-    border-style: solid;
-    border-radius: 0.2rem 0 0 0.2rem;
+
+
+//------------ Page Footer ---------------------------------------------------
+
+body > footer {
+        padding-top: 0.2rem;
 }
-.panel-header-search > input:focus-visible {
-    outline: none;
-    border-color: var(--focus-border-color);
+
+
+//------------ Page Content --------------------------------------------------
+
+body > main {
+        padding-top: 0.2rem;
+        padding-bottom: 0.2rem;
+        border-top: 2px solid var(--header-background-color);
 }
-.panel-header-search > button {
-    border-style: solid solid solid none;
-    border-radius: 0 0.2rem 0.2rem 0;
-    color: var(--cell-color);
-}
+
 
 
 //--- Standard pages
@@ -263,6 +374,9 @@ h2 {
     border-radius: 0.1rem;
     padding: 0.2rem 0;
     list-style: none;
+}
+.home-main-lang .visible {
+    display: block;
 }
 .home-main-lang .menu li {
 }

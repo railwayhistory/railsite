@@ -1,6 +1,6 @@
 use htmlfn::core::Content;
 use htmlfn::utils::display;
-use raildata::document::line::data::{
+use raildata::document::line::{
     Category, Goods, Electrified, Passenger, Status
 };
 use crate::i18n;
@@ -24,8 +24,8 @@ pub fn category(cat: Category, state: &RequestState) -> &'static str {
 pub fn electrified<'a>(
     el: &'a Electrified,  state: &RequestState
 ) -> impl Content + 'a {
-    use raildata::document::line::data::ElSystem::*;
-    use raildata::document::line::data::AcDc::*;
+    use raildata::document::line::ElSystem::*;
+    use raildata::document::line::AcDc::*;
 
     (
         el.generic().map(|gen| {
