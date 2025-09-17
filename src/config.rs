@@ -3,9 +3,19 @@
 use std::fs;
 use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
-use clap::{App, Arg, ArgMatches};
+use clap::{Args, ArgMatches, Command, FromArgMatches, Parser};
 use raildata::load::report::Failed;
 use serde::Deserialize;
+
+
+//------------ ConfigArgs ----------------------------------------------------
+
+#[derive(Clone, Debug, Parser)]
+struct ConfigArgs {
+    /// Read base configuration from this file
+    #[arg(short, long, value_name="PATH", default_value="railsite.toml")]
+    config: PathBuf,
+}
 
 
 //------------ Config --------------------------------------------------------
@@ -32,24 +42,18 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn config_args<'a: 'b, 'b>(app: App<'a, 'b>) -> App<'a, 'b> {
-        app
-        .arg(Arg::with_name("config")
-             .short("c")
-             .long("config")
-             .takes_value(true)
-             .value_name("PATH")
-             .help("Read base configuration from this file")
-        )
+    pub fn config_args(app: Command) -> Command {
+        ConfigArgs::augment_args(app)
     }
 
     pub fn from_arg_matches(
         matches: &ArgMatches,
         cur_dir: &Path,
     ) -> Result<Self, Failed> {
-        let config_path = cur_dir.join(
-            matches.value_of("config").unwrap_or("railsite.toml")
+        let args = ConfigArgs::from_arg_matches(matches).expect(
+            "bug in command line arguments parser"
         );
+        let config_path = cur_dir.join(&args.config);
 
         let config = match fs::read_to_string(&config_path) {
             Ok(config) => config,

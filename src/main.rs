@@ -1,5 +1,5 @@
 use std::env::current_dir;
-use clap::{App, crate_authors, crate_version};
+use clap::{Command, crate_authors, crate_version};
 use railsite::server;
 use railsite::config::Config;
 use railsite::state::ServerState;
@@ -19,7 +19,7 @@ async fn main() {
 
     let config = Config::from_arg_matches(
         &Config::config_args(
-            App::new("railsite")
+            Command::new("railsite")
                 .version(crate_version!())
                 .author(crate_authors!())
                 .about("the railwayhistory.org server")
